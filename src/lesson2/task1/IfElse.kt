@@ -3,6 +3,7 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
@@ -69,10 +70,10 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-   return if ((age % 100) in 10..20) "$age лет"
-          else if ((age % 10) in 2..4) "$age года"
-          else if ((age % 10) == 1) "$age год"
-          else "$age лет"
+    return if ((age % 100) in 10..20) "$age лет"
+    else if ((age % 10) in 2..4) "$age года"
+    else if ((age % 10) == 1) "$age год"
+    else "$age лет"
 
 }
 
@@ -88,9 +89,11 @@ fun timeForHalfWay(
     t2: Double, v2: Double,
     t3: Double, v3: Double
 ): Double {
-    val sfull = (v1*t1 + v2*t2 + v3*t3)
-    val vhalf = (sfull/(t1+t2+t3))
-    return ((sfull/2)/vhalf)
+    val shalf = (v1 * t1 + v2 * t2 + v3 * t3) / 2
+    return if (shalf <= v1 * t1) (shalf / v1)
+    else if (shalf <= (v1 * t1 + v2 * t2)) (t1 + (shalf - v1 * t1) / v2)
+    else if (shalf <= (v1 * t1 + v2 * t2 + v3 * t3)) (t1 + t2 + (shalf - v1 * t1 - v2 * t2) / v3)
+    else (0.0)
 
 
 }
@@ -144,4 +147,22 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int =
+    when {
+        (a < c) && (b < c) -> -1
+        (a < c) && (b == c) -> 0
+        (a < c) && (b > c) && (b < d) -> (b - c)
+        (a < c) && (b == d) -> (b - c)
+        (a < c) && (b > d) -> (d - c)
+        (a == c) && (b == c) -> 0
+        (a == c) && (b > c) && (b < d) -> (b - a)
+        (a == c) && (b == d) -> (b - a)
+        (a == c) && (b > d) -> (d - a)
+        (a > c) && (a < d) && (b < d) -> (b - a)
+        (a > c) && (a < d) && (b == d) -> (b - a)
+        (a > c) && (a < d) && (b > d) -> (d - a)
+        (a == d) && (b == d) -> 0
+        (a > d) && (b > d) -> -1
+        else -> -10
+    }
+
