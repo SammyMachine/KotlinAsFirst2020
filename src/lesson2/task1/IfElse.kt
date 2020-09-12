@@ -3,6 +3,7 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
+import lesson1.task1.sqr
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -111,7 +112,15 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int =
+    when {
+        (kingX != rookX1) && (kingY != rookY1) && (kingX != rookX2) && (kingX != rookY2) -> 0
+        ((kingX == rookX1) || (kingY == rookY1)) && ((kingX == rookX2) || (kingX == rookY2)) -> 3
+        (kingX == rookX1) || (kingY == rookY1) -> 1
+        (kingX == rookX2) ||  (kingY == rookY2) -> 2
+
+    else -> 1000000
+    }
 
 /**
  * Простая (2 балла)
@@ -127,7 +136,16 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int =
+    when {
+        (kingX != rookX) && (kingY != rookY) && ((abs(kingX - bishopX)) != (abs(kingY - bishopY))) -> 0
+        ((kingX == rookX) || (kingY == rookY)) && (abs(kingX - bishopX) == (abs(kingY - bishopY))) -> 3
+        (kingX == rookX) || (kingY == rookY) -> 1
+        (abs(kingX - bishopX)) == (abs(kingY - bishopY)) -> 2
+
+
+        else -> 1000000
+    }
 
 /**
  * Простая (2 балла)
@@ -137,8 +155,18 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
-
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    val max = (maxOf(a, b, c))
+    val min = (minOf(a, b, c))
+    val mid = (abs(max + min - a - b - c))
+    return when {
+        ((max + min) <= mid) || ((min + mid) <= max) || ((mid + max) <= min) -> -1
+        (sqr(max) < (sqr(mid) + sqr(min))) -> 0
+        (sqr(max) == (sqr(mid) + sqr(min))) -> 1
+        (sqr(max) > (sqr(mid) + sqr(min))) -> 2
+        else -> 10210
+    }
+}
 /**
  * Средняя (3 балла)
  *
