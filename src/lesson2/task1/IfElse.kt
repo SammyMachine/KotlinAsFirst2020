@@ -93,8 +93,7 @@ fun timeForHalfWay(
     val shalf = (v1 * t1 + v2 * t2 + v3 * t3) / 2
     return if (shalf <= v1 * t1) (shalf / v1)
     else if (shalf <= (v1 * t1 + v2 * t2)) (t1 + (shalf - v1 * t1) / v2)
-    else if (shalf <= (v1 * t1 + v2 * t2 + v3 * t3)) (t1 + t2 + (shalf - v1 * t1 - v2 * t2) / v3)
-    else (0.0)
+    else (t1 + t2 + (shalf - v1 * t1 - v2 * t2) / v3)
 
 
 }
@@ -117,9 +116,9 @@ fun whichRookThreatens(
         (kingX != rookX1) && (kingY != rookY1) && (kingX != rookX2) && (kingX != rookY2) -> 0
         ((kingX == rookX1) || (kingY == rookY1)) && ((kingX == rookX2) || (kingX == rookY2)) -> 3
         (kingX == rookX1) || (kingY == rookY1) -> 1
-        (kingX == rookX2) ||  (kingY == rookY2) -> 2
 
-    else -> 1000000
+
+    else -> 2
     }
 
 /**
@@ -141,10 +140,10 @@ fun rookOrBishopThreatens(
         (kingX != rookX) && (kingY != rookY) && ((abs(kingX - bishopX)) != (abs(kingY - bishopY))) -> 0
         ((kingX == rookX) || (kingY == rookY)) && (abs(kingX - bishopX) == (abs(kingY - bishopY))) -> 3
         (kingX == rookX) || (kingY == rookY) -> 1
-        (abs(kingX - bishopX)) == (abs(kingY - bishopY)) -> 2
 
 
-        else -> 1000000
+
+        else -> 2
     }
 
 /**
@@ -163,8 +162,8 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
         ((max + min) <= mid) || ((min + mid) <= max) || ((mid + max) <= min) -> -1
         (sqr(max) < (sqr(mid) + sqr(min))) -> 0
         (sqr(max) == (sqr(mid) + sqr(min))) -> 1
-        (sqr(max) > (sqr(mid) + sqr(min))) -> 2
-        else -> 10210
+
+        else -> 2
     }
 }
 /**
@@ -190,7 +189,7 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int =
         (a > c) && (a < d) && (b == d) -> (b - a)
         (a > c) && (a < d) && (b > d) -> (d - a)
         (a == d) && (b == d) -> 0
-        (a > d) && (b > d) -> -1
-        else -> -10
+
+        else -> -1
     }
 
