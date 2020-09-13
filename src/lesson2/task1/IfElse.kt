@@ -6,6 +6,7 @@ import lesson1.task1.discriminant
 import lesson1.task1.sqr
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sqrt
 
 // Урок 2: ветвления (здесь), логический тип (см. 2.2).
@@ -70,13 +71,13 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String {
-    return if ((age % 100) in 10..20) "$age лет"
-    else if ((age % 10) in 2..4) "$age года"
-    else if ((age % 10) == 1) "$age год"
-    else "$age лет"
-
-}
+fun ageDescription(age: Int): String =
+    when {
+        ((age % 100) in 10..20) -> "$age лет"
+        ((age % 10) in 2..4) -> "$age года"
+        ((age % 10) == 1) -> "$age год"
+        else -> "$age лет"
+    }
 
 /**
  * Простая (2 балла)
@@ -90,12 +91,15 @@ fun timeForHalfWay(
     t2: Double, v2: Double,
     t3: Double, v3: Double
 ): Double {
-    val shalf = (v1 * t1 + v2 * t2 + v3 * t3) / 2
-    return if (shalf <= v1 * t1) (shalf / v1)
-    else if (shalf <= (v1 * t1 + v2 * t2)) (t1 + (shalf - v1 * t1) / v2)
-    else (t1 + t2 + (shalf - v1 * t1 - v2 * t2) / v3)
-
-
+    val s1 = (v1 * t1)
+    val s2 = (v2 * t2)
+    val s3 = (v3 * t3)
+    val wayhalf = ((s1 + s2 + s3) / 2)
+    return when {
+        (wayhalf <= s1) -> (wayhalf / v1)
+        (wayhalf <= (s1 + s2)) -> (t1 + (wayhalf - s1) / v2)
+        else -> (t1 + t2 + (wayhalf - s1 - s2) / v3)
+    }
 }
 
 /**
@@ -116,9 +120,7 @@ fun whichRookThreatens(
         (kingX != rookX1) && (kingY != rookY1) && (kingX != rookX2) && (kingX != rookY2) -> 0
         ((kingX == rookX1) || (kingY == rookY1)) && ((kingX == rookX2) || (kingX == rookY2)) -> 3
         (kingX == rookX1) || (kingY == rookY1) -> 1
-
-
-    else -> 2
+        else -> 2
     }
 
 /**
@@ -140,9 +142,6 @@ fun rookOrBishopThreatens(
         (kingX != rookX) && (kingY != rookY) && ((abs(kingX - bishopX)) != (abs(kingY - bishopY))) -> 0
         ((kingX == rookX) || (kingY == rookY)) && (abs(kingX - bishopX) == (abs(kingY - bishopY))) -> 3
         (kingX == rookX) || (kingY == rookY) -> 1
-
-
-
         else -> 2
     }
 
@@ -162,10 +161,10 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
         ((max + min) <= mid) || ((min + mid) <= max) || ((mid + max) <= min) -> -1
         (sqr(max) < (sqr(mid) + sqr(min))) -> 0
         (sqr(max) == (sqr(mid) + sqr(min))) -> 1
-
         else -> 2
     }
 }
+
 /**
  * Средняя (3 балла)
  *
@@ -174,22 +173,8 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int =
-    when {
-        (a < c) && (b < c) -> -1
-        (a < c) && (b == c) -> 0
-        (a < c) && (b > c) && (b < d) -> (b - c)
-        (a < c) && (b == d) -> (b - c)
-        (a < c) && (b > d) -> (d - c)
-        (a == c) && (b == c) -> 0
-        (a == c) && (b > c) && (b < d) -> (b - a)
-        (a == c) && (b == d) -> (b - a)
-        (a == c) && (b > d) -> (d - a)
-        (a > c) && (a < d) && (b < d) -> (b - a)
-        (a > c) && (a < d) && (b == d) -> (b - a)
-        (a > c) && (a < d) && (b > d) -> (d - a)
-        (a == d) && (b == d) -> 0
-
-        else -> -1
-    }
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    if (c > b || d < a) return -1
+    return min(b, d) - max(a, c)
+}
 
