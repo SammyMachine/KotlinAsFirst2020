@@ -91,14 +91,14 @@ fun timeForHalfWay(
     t2: Double, v2: Double,
     t3: Double, v3: Double
 ): Double {
-    val s1 = (v1 * t1)
-    val s2 = (v2 * t2)
-    val s3 = (v3 * t3)
-    val wayhalf = ((s1 + s2 + s3) / 2)
+    val s1 = v1 * t1
+    val s2 = v2 * t2
+    val s3 = v3 * t3
+    val wayhalf = (s1 + s2 + s3) / 2
     return when {
-        (wayhalf <= s1) -> (wayhalf / v1)
-        (wayhalf <= (s1 + s2)) -> (t1 + (wayhalf - s1) / v2)
-        else -> (t1 + t2 + (wayhalf - s1 - s2) / v3)
+        wayhalf <= s1 -> wayhalf / v1
+        wayhalf <= (s1 + s2) -> t1 + (wayhalf - s1) / v2
+        else -> t1 + t2 + (wayhalf - s1 - s2) / v3
     }
 }
 
@@ -115,14 +115,16 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int =
-    when {
-        (kingX != rookX1) && (kingY != rookY1) && (kingX != rookX2) && (kingX != rookY2) -> 0
-        ((kingX == rookX1) || (kingY == rookY1)) && ((kingX == rookX2) || (kingX == rookY2)) -> 3
-        (kingX == rookX1) || (kingY == rookY1) -> 1
-        else -> 2
+): Int {
+    val condition1 = kingX == rookX1 || kingY == rookY1
+    val condition2 = kingX == rookX2 || kingY == rookY2
+    return when {
+        condition1 && condition2 -> 3
+        condition1 -> 1
+        condition2 -> 2
+        else -> 0
     }
-
+}
 /**
  * Простая (2 балла)
  *
@@ -139,9 +141,9 @@ fun rookOrBishopThreatens(
     bishopX: Int, bishopY: Int
 ): Int =
     when {
-        (kingX != rookX) && (kingY != rookY) && ((abs(kingX - bishopX)) != (abs(kingY - bishopY))) -> 0
-        ((kingX == rookX) || (kingY == rookY)) && (abs(kingX - bishopX) == (abs(kingY - bishopY))) -> 3
-        (kingX == rookX) || (kingY == rookY) -> 1
+        (kingX != rookX) && (kingY != rookY) && (abs(kingX - bishopX) != abs(kingY - bishopY)) -> 0
+        (kingX == rookX) || (kingY == rookY) && (abs(kingX - bishopX) == abs(kingY - bishopY)) -> 3
+        kingX == rookX || kingY == rookY -> 1
         else -> 2
     }
 
@@ -154,13 +156,13 @@ fun rookOrBishopThreatens(
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    val max = (maxOf(a, b, c))
-    val min = (minOf(a, b, c))
-    val mid = (abs(max + min - a - b - c))
+    val max = maxOf(a, b, c)
+    val min = minOf(a, b, c)
+    val mid = abs(max + min - a - b - c)
     return when {
-        ((max + min) <= mid) || ((min + mid) <= max) || ((mid + max) <= min) -> -1
-        (sqr(max) < (sqr(mid) + sqr(min))) -> 0
-        (sqr(max) == (sqr(mid) + sqr(min))) -> 1
+        max + min <= mid || min + mid <= max || mid + max <= min -> -1
+        sqr(max) < sqr(mid) + sqr(min) -> 0
+        sqr(max) == sqr(mid) + sqr(min) -> 1
         else -> 2
     }
 }
