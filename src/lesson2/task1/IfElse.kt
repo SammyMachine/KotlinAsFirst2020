@@ -73,9 +73,9 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  */
 fun ageDescription(age: Int): String =
     when {
-        ((age % 100) in 10..20) -> "$age лет"
-        ((age % 10) in 2..4) -> "$age года"
-        ((age % 10) == 1) -> "$age год"
+        age % 100 in 10..20 -> "$age лет"
+        age % 10 in 2..4 -> "$age года"
+        age % 10 == 1 -> "$age год"
         else -> "$age лет"
     }
 
@@ -97,7 +97,7 @@ fun timeForHalfWay(
     val wayhalf = (s1 + s2 + s3) / 2
     return when {
         wayhalf <= s1 -> wayhalf / v1
-        wayhalf <= (s1 + s2) -> t1 + (wayhalf - s1) / v2
+        wayhalf <= s1 + s2 -> t1 + (wayhalf - s1) / v2
         else -> t1 + t2 + (wayhalf - s1 - s2) / v3
     }
 }
@@ -139,14 +139,16 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int =
-    when {
-        (kingX != rookX) && (kingY != rookY) && (abs(kingX - bishopX) != abs(kingY - bishopY)) -> 0
-        (kingX == rookX) || (kingY == rookY) && (abs(kingX - bishopX) == abs(kingY - bishopY)) -> 3
-        kingX == rookX || kingY == rookY -> 1
-        else -> 2
+): Int {
+    val condition1 = kingX == rookX || kingY == rookY
+    val condition2 = abs(kingX - bishopX) == abs(kingY - bishopY)
+    return when {
+        condition1 && condition2 -> 3
+        condition1 -> 1
+        condition2 -> 2
+        else -> 0
     }
-
+}
 /**
  * Простая (2 балла)
  *
