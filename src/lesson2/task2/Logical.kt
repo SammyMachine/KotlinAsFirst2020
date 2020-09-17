@@ -4,6 +4,7 @@ package lesson2.task2
 
 import lesson1.task1.sqr
 import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
  * Пример
@@ -40,8 +41,8 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
  */
 fun daysInMonth(month: Int, year: Int): Int =
     if (month != 2)
-        (if (month in 1..7 step 2 || month in 8..12 step 2) 31 else 30)
-    else (if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) 29 else 28)
+        if (month in 1..7 step 2 || month in 8..12 step 2) 31 else 30
+    else if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) 29 else 28
 
 /**
  * Простая (2 балла)
@@ -54,7 +55,7 @@ fun circleInside(
     x1: Double, y1: Double, r1: Double,
     x2: Double, y2: Double, r2: Double
 ): Boolean =
-    sqr(abs(x1 - x2)) + sqr(abs(y1 - y2)) == sqr(r1 - r2)
+    sqrt(sqr(x2 - x1) + sqr(y2 - y1)) + r1 <= r2
 
 /**
  * Средняя (3 балла)
