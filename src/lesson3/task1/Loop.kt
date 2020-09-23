@@ -4,11 +4,9 @@ package lesson3.task1
 
 import lesson1.task1.sqr
 import lesson4.task1.factorize
+import java.lang.Math.ceil
 import java.lang.Math.pow
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 
 // Урок 3: циклы
 // Максимальное количество баллов = 9
@@ -78,16 +76,8 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int {
-    var digits = 0
-    var n1 = n
-    if (n == 0) digits = 1 else
-        while (n1 > 0) {
-            n1 /= 10
-            digits++
-        }
-    return digits
-}
+fun digitNumber(n: Int): Int =
+    kotlin.math.ceil(abs(log10(abs(n) + 0.5))).toInt()
 
 /**
  * Простая (2 балла)
@@ -95,9 +85,15 @@ fun digitNumber(n: Int): Int {
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = when {
-    n <= 2 -> 1
-    else -> fib(n - 2) + fib(n - 1)
+fun fib(n: Int): Int {
+    var fib1 = 0
+    var fib2 = 1 // Первый член
+    for (i in 2..n) {
+        val fib3 = fib1 + fib2
+        fib1 = fib2
+        fib2 = fib3
+    }
+    return fib2
 }
 
 /**
@@ -106,12 +102,18 @@ fun fib(n: Int): Int = when {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    var counter = 1
-    while (counter < n) {
-        counter++
-        if (n % counter == 0) break else continue
+    if (n % 2 == 0) return 2
+    val sqrtN = sqrt(n.toDouble()).toInt() + 1
+    var found = false
+    var k = 3
+    while (k < sqrtN) {
+        if (n % k == 0) {
+            found = true
+            break
+        }
+        k += 2
     }
-    return counter
+    return if (found) k else n
 }
 
 /**
@@ -119,14 +121,7 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int {
-    var counter = n - 1
-    while (counter < n) {
-        counter--
-        if (n % counter == 0) break else continue
-    }
-    return counter
-}
+fun maxDivisor(n: Int): Int = n / minDivisor(n)
 
 /**
  * Простая (2 балла)
@@ -191,7 +186,7 @@ fun isCoPrime(m: Int, n: Int): Boolean =
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
-    for (k in 1..sqrt(n.toDouble()).toInt()) {
+    for (k in sqrt(m.toDouble()).toInt()..sqrt(n.toDouble()).toInt()) {
         if (k * k in m..n) return true
     }
     return false
