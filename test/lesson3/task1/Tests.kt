@@ -131,6 +131,11 @@ class Tests {
         assertEquals(111, collatzSteps(1000))
         assertEquals(128, collatzSteps(100000))
     }
+    @Test
+    @Tag("3")
+    fun gcd() {
+        assertEquals(6, gcd(30, 18))
+    }
 
     @Test
     @Tag("3")
