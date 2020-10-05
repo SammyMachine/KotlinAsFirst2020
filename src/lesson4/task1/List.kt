@@ -192,7 +192,11 @@ fun polynom(p: List<Int>, x: Int): Int {
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
+fun accumulate(list: MutableList<Int>): MutableList<Int> {
+    for (i in 1 until list.size)
+        list[i] += list[i - 1]
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -201,7 +205,20 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
-fun factorize(n: Int): List<Int> = TODO()
+fun factorize(n: Int): List<Int> {
+    var varN = n
+    val div = mutableListOf<Int>()
+    var k = 2
+    while (k < varN) {
+        while (varN % k == 0) {
+            div.add(k)
+            varN /= k
+        }
+        k++
+    }
+    if (varN > 1) div.add(k)
+    return div
+}
 
 /**
  * Сложная (4 балла)
@@ -210,7 +227,7 @@ fun factorize(n: Int): List<Int> = TODO()
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = TODO()
+fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
 
 /**
  * Средняя (3 балла)
@@ -219,7 +236,18 @@ fun factorizeToString(n: Int): String = TODO()
  * Результат перевода вернуть в виде списка цифр в base-ичной системе от старшей к младшей,
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
-fun convert(n: Int, base: Int): List<Int> = TODO()
+fun convert(n: Int, base: Int): List<Int> {
+    var number = n
+    var result = mutableListOf<Int>()
+    if (number == 0) result.add(0)
+    else {
+        while (number >= 1) {
+            result.add(number % base)
+            number /= base
+        }
+    }
+    return result.reversed()
+}
 
 /**
  * Сложная (4 балла)
@@ -232,7 +260,12 @@ fun convert(n: Int, base: Int): List<Int> = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, n.toString(base) и подобные), запрещается.
  */
-fun convertToString(n: Int, base: Int): String = TODO()
+fun convertToString(n: Int, base: Int): String =
+    if (n == 0) "0"
+    else convert(n, base).joinToString(separator = "") {
+        (if (it >= 10) (it - 10 + 'a'.toInt()).toChar().toString() else it.toString())
+    }
+
 
 /**
  * Средняя (3 балла)
@@ -241,7 +274,15 @@ fun convertToString(n: Int, base: Int): String = TODO()
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int = TODO()
+fun decimal(digits: List<Int>, base: Int): Int {
+    var result = 0
+    var numberRank = 1
+    for (i in digits.indices.reversed()) {
+        result += digits[i] * numberRank
+        numberRank *= base
+    }
+    return result
+}
 
 /**
  * Сложная (4 балла)
@@ -255,7 +296,8 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, str.toInt(base)), запрещается.
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int =
+    decimal(str.toList().map { if (it in 'a'..'z') it.toInt() - 'a'.toInt() + 10 else it.toInt() - '0'.toInt() }, base)
 
 /**
  * Сложная (5 баллов)
@@ -265,7 +307,33 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
+
+fun roman(n: Int): String {
+    var varN = n
+    var result = ""
+    val replacement = mapOf(
+        1000 to "M",
+        900 to "CM",
+        500 to "D",
+        400 to "CD",
+        100 to "C",
+        90 to "XC",
+        50 to "L",
+        40 to "XL",
+        10 to "X",
+        9 to "IX",
+        5 to "V",
+        4 to "IV",
+        1 to "I",
+    )
+    for ((arabic, roman) in replacement) {
+        while (varN >= arabic) {
+            result += roman
+            varN -= arabic
+        }
+    }
+    return result
+}
 
 /**
  * Очень сложная (7 баллов)
@@ -274,4 +342,69 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russian(n: Int): String {
+    val first = n / 100000
+    val second = n / 10000 % 10
+    val third = n / 1000 % 10
+    val fourth = n / 100 % 10
+    val fifth = n / 10 % 10
+    val sixth = n % 10
+    var result = ""
+    val replacementOnes = mapOf(
+        1 to "один",
+        2 to "два",
+        3 to "три",
+        4 to "четыре",
+        5 to "пять",
+        6 to "шесть",
+        7 to "семь",
+        8 to "восемь",
+        9 to "девять",
+        11 to "одиннадцать",
+        12 to "двенадцать",
+        13 to "тринадцать",
+        14 to "четырнадцать",
+        15 to "пятнадцать",
+        16 to "шестнадцать",
+        17 to "семнадцать",
+        18 to "восемнадцать",
+        19 to "девятнадцать"
+    )
+    val replacementDecades = mapOf(
+        1 to "десять",
+        2 to "двадцать",
+        3 to "тридцать",
+        4 to "сорок",
+        5 to "пятьдесят",
+        6 to "шестьдесят",
+        7 to "семьдесят",
+        8 to "восемьдесят",
+        9 to "девяносто"
+    )
+    val replacementHundreds = mapOf(
+        0 to "",
+        1 to "сто",
+        2 to "двести",
+        3 to "триста",
+        4 to "четыреста",
+        5 to "пятьсот",
+        6 to "шестьсот",
+        7 to "семьсот",
+        8 to "восемьсот",
+        9 to "девятьсот"
+    )
+    val thousands = "тысяч"
+    val replacementThousands = mapOf(
+        0 to thousands,
+        1 to "тысяча",
+        2 to "две тысячи",
+        3 to "три тысячи",
+        4 to "четыре тысячи",
+        5 to replacementOnes[5] + "" + thousands,
+        6 to replacementOnes[6] + "" + thousands,
+        7 to replacementOnes[7] + "" + thousands,
+        8 to replacementOnes[8] + "" + thousands,
+        9 to replacementOnes[9] + "" + thousands,
+    )
+    return result
+}
