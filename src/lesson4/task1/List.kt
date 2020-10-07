@@ -238,7 +238,7 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  */
 fun convert(n: Int, base: Int): List<Int> {
     var number = n
-    var result = mutableListOf<Int>()
+    val result = mutableListOf<Int>()
     if (number == 0) result.add(0)
     else {
         while (number >= 1) {
@@ -310,7 +310,6 @@ fun decimalFromString(str: String, base: Int): Int =
 
 fun roman(n: Int): String {
     var varN = n
-    var result = ""
     val replacement = mapOf(
         1000 to "M",
         900 to "CM",
@@ -326,6 +325,7 @@ fun roman(n: Int): String {
         4 to "IV",
         1 to "I",
     )
+    var result = ""
     for ((arabic, roman) in replacement) {
         while (varN >= arabic) {
             result += roman
@@ -343,13 +343,8 @@ fun roman(n: Int): String {
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val first = n / 100000
-    val second = n / 10000 % 10
-    val third = n / 1000 % 10
-    val fourth = n / 100 % 10
-    val fifth = n / 10 % 10
-    val sixth = n % 10
     var result = ""
+    var varN = n
     val replacementOnes = mapOf(
         1 to "один",
         2 to "два",
@@ -393,18 +388,149 @@ fun russian(n: Int): String {
         8 to "восемьсот",
         9 to "девятьсот"
     )
-    val thousands = "тысяч"
     val replacementThousands = mapOf(
-        0 to thousands,
+        0 to "тысяч",
         1 to "тысяча",
         2 to "две тысячи",
         3 to "три тысячи",
         4 to "четыре тысячи",
-        5 to replacementOnes[5] + "" + thousands,
-        6 to replacementOnes[6] + "" + thousands,
-        7 to replacementOnes[7] + "" + thousands,
-        8 to replacementOnes[8] + "" + thousands,
-        9 to replacementOnes[9] + "" + thousands,
+        5 to replacementOnes[5] + "тысяч",
+        6 to replacementOnes[6] + "тысяч",
+        7 to replacementOnes[7] + "тысяч",
+        8 to replacementOnes[8] + "тысяч",
+        9 to replacementOnes[9] + "тысяч",
     )
+    var digits = 0
+    while (varN >= 1) {
+        digits++
+        varN /= 10
+    }
+    when {
+        digits == 1 -> for ((digit, russian) in replacementOnes) {
+            if (n == digit) result += russian
+        }
+        digits == 2 && n in 11..19 -> for ((digit, russian) in replacementOnes) {
+            if (n % 100 == digit) result += russian
+        }
+        digits == 2 && (n == 10 || n in 20..99) -> {
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+        }
+        digits == 3 -> {
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100 % 10 == digit) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit && n / 10 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+        }
+        digits == 4 -> {
+            for ((digit, russian) in replacementThousands) {
+                if (n / 1000 % 10 == digit) result += "$russian "
+            }
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100 % 10 == digit && n / 100 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit && n / 10 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+        }
+        digits == 5 && n / 1000 in 11..19 -> {
+            for ((digit, russian) in replacementOnes) {
+                if (n / 1000 == digit) result += "$russian тысяч "
+            }
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100 % 10 == digit && n / 100 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit && n / 10 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+        }
+        digits == 5 -> {
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10000 % 10 == digit) result += "$russian "
+            }
+            for ((digit, russian) in replacementThousands) {
+                if (n / 1000 % 10 == digit && n / 1000 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100 % 10 == digit && n / 100 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit && n / 10 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+        }
+
+        digits == 6 && n / 1000 % 100 in 11..19 -> {
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100000 == digit) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n / 1000 % 100 == digit) result += "$russian тысяч "
+            }
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100 % 10 == digit) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit && n / 10 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+        }
+        digits == 6 && n / 1000 % 100 == 0 -> {
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100000 == digit && n % 100000 == 0) result = "$russian тысяч"
+                else if (n / 100000 == digit) result += "$russian тысяч "
+            }
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100 % 10 == digit && n / 100 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit && n / 10 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+
+        }
+        else -> {
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100000 == digit) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10000 % 10 == digit && n / 10000 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementThousands) {
+                if (n / 1000 % 10 == digit && n / 1000 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementHundreds) {
+                if (n / 100 % 10 == digit && n / 100 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementDecades) {
+                if (n / 10 % 10 == digit && n / 10 % 10 != 0) result += "$russian "
+            }
+            for ((digit, russian) in replacementOnes) {
+                if (n % 10 == digit && n % 10 != 0) result += russian
+            }
+
+        }
+    }
     return result
 }
