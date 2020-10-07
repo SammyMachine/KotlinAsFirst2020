@@ -239,13 +239,10 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
 fun convert(n: Int, base: Int): List<Int> {
     var number = n
     val result = mutableListOf<Int>()
-    if (number == 0) result.add(0)
-    else {
-        while (number >= 1) {
-            result.add(number % base)
-            number /= base
-        }
-    }
+    do {
+        result.add(number % base)
+        number /= base
+    } while (number >= 1)
     return result.reversed()
 }
 
@@ -262,9 +259,9 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun convertToString(n: Int, base: Int): String =
     if (n == 0) "0"
-    else convert(n, base).joinToString(separator = "") {
-        (if (it >= 10) (it - 10 + 'a'.toInt()).toChar().toString() else it.toString())
-    }
+    else convert(n, base).map {
+        if (it >= 10) ('a' + it - 10) else it
+    }.joinToString(separator = "")
 
 
 /**
@@ -297,7 +294,7 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int =
-    decimal(str.toList().map { if (it in 'a'..'z') it.toInt() - 'a'.toInt() + 10 else it.toInt() - '0'.toInt() }, base)
+    decimal(str.toList().map { if (it in 'a'..'z') it - 'a' + 10 else it - '0' }, base)
 
 /**
  * Сложная (5 баллов)
@@ -406,9 +403,7 @@ fun russian(n: Int): String {
         varN /= 10
     }
     when {
-        digits == 1 -> for ((digit, russian) in replacementOnes) {
-            if (n == digit) result += russian
-        }
+        digits == 1 -> result += replacementOnes[n]
         digits == 2 && n in 11..19 -> for ((digit, russian) in replacementOnes) {
             if (n % 100 == digit) result += russian
         }
@@ -532,5 +527,148 @@ fun russian(n: Int): String {
 
         }
     }
+    return result
+}
+
+
+fun russian1(n: Int): String {
+    var result = ""
+    var varN = n
+    val replacementOnes = mapOf(
+        1 to "один",
+        2 to "два",
+        3 to "три",
+        4 to "четыре",
+        5 to "пять",
+        6 to "шесть",
+        7 to "семь",
+        8 to "восемь",
+        9 to "девять",
+        11 to "одиннадцать",
+        12 to "двенадцать",
+        13 to "тринадцать",
+        14 to "четырнадцать",
+        15 to "пятнадцать",
+        16 to "шестнадцать",
+        17 to "семнадцать",
+        18 to "восемнадцать",
+        19 to "девятнадцать"
+    )
+    val replacementDecades = mapOf(
+        1 to "десять",
+        2 to "двадцать",
+        3 to "тридцать",
+        4 to "сорок",
+        5 to "пятьдесят",
+        6 to "шестьдесят",
+        7 to "семьдесят",
+        8 to "восемьдесят",
+        9 to "девяносто"
+    )
+    val replacementHundreds = mapOf(
+        0 to "",
+        1 to "сто",
+        2 to "двести",
+        3 to "триста",
+        4 to "четыреста",
+        5 to "пятьсот",
+        6 to "шестьсот",
+        7 to "семьсот",
+        8 to "восемьсот",
+        9 to "девятьсот"
+    )
+    val replacementThousands = mapOf(
+        0 to "тысяч",
+        1 to "тысяча",
+        2 to "две тысячи",
+        3 to "три тысячи",
+        4 to "четыре тысячи",
+        5 to replacementOnes[5] + "тысяч",
+        6 to replacementOnes[6] + "тысяч",
+        7 to replacementOnes[7] + "тысяч",
+        8 to replacementOnes[8] + "тысяч",
+        9 to replacementOnes[9] + "тысяч",
+    )
+    var digits = 0
+    while (varN >= 1) {
+        digits++
+        varN /= 10
+    }
+    if (digits >= 1)
+        when {
+            digits == 6 -> {
+                result += replacementHundreds[n / 100000]
+                if (n / 1000 % 100 == 0) {
+                    result += " тысяч"
+                    if (n / 100 % 10 != 0) result += " " + replacementHundreds[n / 100 % 10]
+                    if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
+                    else if (n % 100 != 0) {
+                        if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                        if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                    }
+                } else if (n / 1000 % 100 in 11..19) {
+                    result += " " + replacementOnes[n / 1000 % 100] + " тысяч"
+                    if (n / 100 % 10 != 0) result += " " + replacementHundreds[n / 100 % 10]
+                    if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
+                    else if (n % 100 != 0) {
+                        if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                        if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                    }
+                } else if (n / 10000 % 10 != 0) {
+                    result += " " + replacementDecades[n / 10000 % 10]
+                    if (n / 1000 % 10 != 0) result += " " + replacementThousands[n / 1000 % 10]
+                    if (n / 100 % 10 != 0) result += " " + replacementHundreds[n / 100 % 10]
+                    if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
+                    else if (n % 100 != 0) {
+                        if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                        if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                    }
+
+                }
+            }
+            digits == 5 && n / 1000 % 100 in 11..19 -> {
+                if (n % 1000 == 0) result += replacementOnes[n / 1000] + " тысяч"
+                else if (n / 100 % 10 != 0) result += " " + replacementHundreds[n / 100 % 10]
+                if (n % 100 in 11..19) result += " " + replacementOnes[n / 10]
+                else if (n % 100 != 0) {
+                    if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                    if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                }
+            }
+            digits == 5 -> {
+                result += replacementDecades[n / 10000]
+                if (n % 10000 == 0) result += replacementDecades[n / 10000] + " тысяч"
+                else if (n % 1000 != 0) result += " " + replacementThousands[n / 1000 % 10]
+                if (n / 100 % 10 != 0) result += " " + replacementHundreds[n / 100 % 10]
+                if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
+                else if (n % 100 != 0) {
+                    if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                    if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                }
+            }
+            digits == 4 -> {
+                result += replacementThousands[n / 1000]
+                if (n / 100 % 10 != 0) result += " " + replacementHundreds[n / 100 % 10]
+                if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
+                else if (n % 100 != 0) {
+                    if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                    if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                }
+            }
+            digits == 3 -> {
+                result += replacementHundreds[n / 100]
+                if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
+                else if (n % 100 != 0) {
+                    if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                    if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                }
+            }
+            digits == 2 && n in 11..19 -> result += replacementOnes[n % 100]
+            digits == 2 -> {
+                result += replacementDecades[n / 10]
+                if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+            }
+            else -> result += replacementOnes[n]
+        }
     return result
 }
