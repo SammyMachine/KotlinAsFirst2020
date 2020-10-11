@@ -409,11 +409,10 @@ fun russian(n: Int): String {
                 else {
                     if (n / 10000 % 10 != 0) {
                         result += " " + replacementDecades[n / 10000 % 10]
-                        result += " " + replacementThousands[n / 1000 % 10]
+                        result += if (n / 1000 % 10 != 1) " " + replacementThousands[n / 1000 % 10] else " одна тысяча"
                     } else {
-                        if (n / 1000 % 10 != 0) result += replacementThousands[n / 1000 % 10]
+                        if (n / 1000 % 10 != 0) result += if (n / 1000 % 10 != 1) " " + replacementThousands[n / 1000 % 10] else " одна тысяча"
                     }
-
                 }
             } else result += " тысяч"
         } else if (n / 1000 % 100 != 0) {
@@ -421,14 +420,12 @@ fun russian(n: Int): String {
             else {
                 if (n / 10000 % 10 != 0) {
                     result += replacementDecades[n / 10000 % 10]
-                    result += " " + replacementThousands[n / 1000 % 10]
+                    result += if (n / 1000 % 10 != 1) " " + replacementThousands[n / 1000 % 10] else " одна тысяча"
                 } else {
                     result += if (n / 1000 % 10 == 0) " тысяч" else replacementThousands[n / 1000 % 10]
                 }
-
             }
         }
-
         if (n / 100 % 10 == 0) {
             if (n % 100 != 0) {
                 if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
@@ -449,12 +446,8 @@ fun russian(n: Int): String {
                 } else {
                     if (n % 10 != 0) result += " " + replacementOnes[n % 10]
                 }
-
             }
-
         }
-
-
     } else {
         if (n / 100 % 10 == 0) {
             if (n % 100 in 11..19) result += replacementOnes[n % 100]
@@ -462,7 +455,6 @@ fun russian(n: Int): String {
                 result += replacementDecades[n / 10 % 10]
                 if (n % 10 != 0) result += " " + replacementOnes[n % 10]
             } else if (n / 10 % 10 == 0) result += replacementOnes[n % 10]
-
         } else {
             result += replacementHundreds[n / 100 % 10]
             if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
@@ -473,9 +465,7 @@ fun russian(n: Int): String {
                 } else {
                     if (n % 10 != 0) result += " " + replacementOnes[n % 10]
                 }
-
             }
-
         }
     }
     return result
