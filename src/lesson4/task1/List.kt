@@ -430,7 +430,10 @@ fun russian(n: Int): String {
             if (n % 100 != 0) {
                 if (n % 100 in 11..19) result += " " + replacementOnes[n % 100]
                 else {
-                    if (n / 10 % 10 != 0) result += " " + replacementDecades[n / 10 % 10]
+                    if (n / 10 % 10 != 0) {
+                        result += " " + replacementDecades[n / 10 % 10]
+                        if (n % 10 != 0) result += " " + replacementOnes[n % 10]
+                    }
                     else {
                         if (n % 10 != 0) result += " " + replacementOnes[n % 10]
                     }
