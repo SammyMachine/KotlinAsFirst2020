@@ -116,7 +116,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
     for ((key, value) in a) {
-        if (b[key] != value) return false
+        if (b[key] != value || b[key] == null) return false
     }
     return true
 }
@@ -251,7 +251,8 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = word.toSet() == chars.toSet()
+fun canBuildFrom(chars: List<Char>, word: String): Boolean =
+    chars.toSet().map { it.toLowerCase() }.containsAll(word.toLowerCase().toSet())
 
 /**
  * Средняя (4 балла)
@@ -286,7 +287,18 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean = TODO()
+fun hasAnagrams(words: List<String>): Boolean {
+    val word = mutableListOf<Set<Char>>()
+    if (words.isNotEmpty()) {
+        for (element in words) word.add(element.toSet())
+        for (element in word) {
+            val list = word.toMutableList()
+            list.remove(element)
+            if (element in list) return true
+        }
+    }
+    return false
+}
 
 /**
  * Сложная (5 баллов)
