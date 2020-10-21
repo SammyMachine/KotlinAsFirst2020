@@ -271,12 +271,9 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    for (i in words.indices) {
-        for (j in i + 1 until words.size)
-            if (words[i].toList().sorted() == words[j].toList().sorted() && words[i].length == words[j].length)
-                return true
-    }
-    return false
+    val word = mutableSetOf<List<Char>>()
+    words.toList().sorted().toSet().forEach { word += it.toList().sorted() }
+    return word.size != words.size
 }
 
 /**
@@ -332,18 +329,15 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    var result: Pair<Int, Int> = -1 to -1
-    if (list.isNotEmpty())
-        for ((index1, value1) in list.withIndex())
-            for ((index2, value2) in list.withIndex())
-                if (value1 + value2 == number && index1 != index2) {
-                    result = index2 to index1
-                    break
-                }
-    return result
-
-}
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> =
+// val result: Pair<Int, Int> = -1 to -1
+// val numberInList = 0
+//   val map = mutableMapOf<Int, Int>()
+//  (list.forEach { map.put(it) } )
+//  for (i in list.indices) {
+//      val numberInList = number - list[i]
+    //  }
+    -1 to -1
 
 /**
  * Очень сложная (8 баллов)
