@@ -340,7 +340,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     if (list2.size > 1) result = list2[0] to list2[1]
     else {
         for ((index, element) in list.withIndex())
-            if (list1.contains(number - element)) {
+            if (list1.contains(element)) {
                 index1 = index
                 breaker = number - element
                 break
