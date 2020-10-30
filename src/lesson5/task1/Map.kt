@@ -97,10 +97,7 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val result = mutableMapOf<Int, MutableList<String>>()
-    for ((key, value) in grades) {
-        if (result[value] == null) result.getOrPut(value) { mutableListOf() }
-        result[value]!! += key
-    }
+    for ((key, value) in grades) result.getOrPut(value) { mutableListOf() } += key
     return result
 }
 
@@ -148,8 +145,10 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * В выходном списке не должно быть повторяюихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = a.toSet().filter { it in b.toSet() }
-
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
+    val b1 = b.toSet()
+    return a.toSet().filter { it in b1 }
+}
 
 /**
  * Средняя (3 балла)
@@ -235,7 +234,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-    chars.map { it.toLowerCase() }.containsAll(word.toLowerCase().toSet())
+    chars.map { it.toLowerCase() }.toSet().containsAll(word.toLowerCase().toSet())
 
 /**
  * Средняя (4 балла)
@@ -252,8 +251,7 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean =
 fun extractRepeats(list: List<String>): Map<String, Int> {
     val result = mutableMapOf<String, Int>()
     for (element in list) {
-        if (result[element] == null) result.getOrPut(element) { 1 }
-        else result[element] = result[element]!! + 1
+        result[element] = result[element]?.plus(1) ?: 1
     }
     return result.filter { it.value > 1 }
 }
@@ -271,8 +269,7 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val word = mutableSetOf<List<Char>>()
-    words.toList().sorted().toSet().forEach { word += it.toList().sorted() }
+    val word = words.sorted().toSet().map { it.toList().sorted() }.toSet()
     return word.size != words.size
 }
 
