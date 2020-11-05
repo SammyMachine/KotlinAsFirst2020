@@ -74,7 +74,29 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val months = mapOf<String, String>(
+        "января" to "01", "февраля" to "02", "марта" to "03", "апреля" to "04",
+        "мая" to "05", "июня" to "06", "июля" to "07", "августа" to "08",
+        "сентября" to "09", "октября" to "10", "ноября" to "11", "декабря" to "12",
+    )
+    var result = ""
+    val parts = str.split(" ")
+    for (part in parts) {
+        if (months[part[1]] == "02") {
+            if (part[3].toInt() % 4 == 0 && part[3].toInt() % 100 != 0 || part[3].toInt() % 400 == 0 && part[0].toInt() <= 29)
+                if (part[0] in 0..9) result = "0$part[0]" else result = "$part[0]"
+            else return result
+        }
+        if (months[part[1]] in 1..7 step 2 || months[part[1]] in 8..12 step 2 && part[0].toInt() <= 31) {
+            if (part[0] in 0..9) result = "0$part[0]" else result = "$part[0]"
+        }
+        else if (months[part[1]] in 1..7 step 2 || months[part[1]] in 8..12 step 2 && part[0].toInt() <= 30)
+            if (part[0] in 0..9) result = "0$part[0]" else result = "$part[0]"
+        if (part[1] in months) result += "$months(part[1])"
+    }
+    return result
+}
 
 /**
  * Средняя (4 балла)
