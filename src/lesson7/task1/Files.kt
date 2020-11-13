@@ -87,7 +87,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     for (string in substrings)
         map[string] = 0
     for (line in File(inputName).readLines().map { it.toLowerCase() })
-        for (string in substrings.toSet()) {
+        for (string in map.keys) {
             var index = line.indexOf(string.toLowerCase())
             while (index != -1) {
                 map[string] = map[string]!! + 1
