@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.lang.StringBuilder
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -112,7 +113,20 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val file = File(outputName).bufferedWriter()
+    val mistakes = listOf('ж', 'ч', 'ш', 'щ')
+    val correctWriting = mapOf('ы' to 'и', 'Ы' to 'И', 'я' to 'а', 'Я' to 'А', 'ю' to 'у', 'Ю' to 'У')
+    for (line in File(inputName).readLines()) {
+        val correctLine = StringBuilder(line)
+        for (index in 0 until line.length - 1) {
+            if (line[index].toLowerCase() in mistakes)
+                if (line[index + 1] in correctWriting)
+                    correctLine[index + 1] = correctWriting[line[index + 1]] ?: error("")
+        }
+        file.write(correctLine.toString())
+        file.newLine()
+    }
+    file.close()
 }
 
 /**
@@ -133,7 +147,18 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val file = File(outputName).bufferedWriter()
+    var mainLine = ""
+    val lines = File(inputName).readLines()
+    for (index in lines)
+        if (index.trim().length > mainLine.length) mainLine = index.trim()
+    for (index in lines) {
+        val correctLine = StringBuilder(index.trim())
+        repeat((mainLine.length - correctLine.length) / 2) { correctLine.insert(0, " ") }
+        file.write(correctLine.toString())
+        file.newLine()
+    }
+    file.close()
 }
 
 /**
@@ -164,7 +189,25 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val file = File(outputName).bufferedWriter()
+    val lines = File(inputName).readLines()
+    var mainLine = ""
+    var correctLines = mutableListOf<String>()
+    for (index in lines) {
+        var correctLine = index.trim()
+        while (correctLine.contains("  "))
+            correctLine = correctLine.replace("  ", " ")
+        correctLines.add(correctLine)
+    }
+    for (index in correctLines)
+        if (index.length > mainLine.length) mainLine = index
+    for (index in correctLines) {
+
+        file.write()
+        file.newLine()
+    }
+    file.close()
+
 }
 
 /**
