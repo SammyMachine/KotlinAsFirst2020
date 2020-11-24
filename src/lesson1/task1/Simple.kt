@@ -137,7 +137,7 @@ fun numberRevert(number: Int): Int =
 
 fun spammer(text: String): Set<String> {
     val map = mutableMapOf<String, List<Int>>()
-    val text1 = text.replace(Regex("""(\w+ \d\d:\d\d)\n"""), "\n ")
+    val text1 = text.replace("\n ", " ")
     val parts = text1.split(" ")
     val set = mutableSetOf<String>()
     val list = mutableListOf<Int>()
@@ -145,12 +145,12 @@ fun spammer(text: String): Set<String> {
         if (parts[i].matches(Regex("""\d\d:\d\d"""))) {
             val k = parts[i].split(":")
             list.add((k[0].toInt() * 60 + k[1].toInt()) * 60)
-        } else list.add(0)
+        }
     }
-    for (i in parts.indices)
+    for (i in parts.indices.step(2))
         if (i % 2 == 0)
-            if (map[parts[i]] == null) map[parts[i]] = listOf(list[i + 1])
-            else map[parts[i]] = map[parts[i]]!! + list[i + 1]
+            if (map[parts[i]] == null) map[parts[i]] = listOf(list[i / 2])
+            else map[parts[i]] = map[parts[i]]!! + list[i / 2]
     for ((key, value) in map) {
         if (value.size > 1)
             for (i in 0 until value.size - 1)
