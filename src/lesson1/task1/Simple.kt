@@ -137,7 +137,7 @@ fun numberRevert(number: Int): Int =
 
 fun spammer(text: String): Set<String> {
     val map = mutableMapOf<String, List<Int>>()
-    val text1 = text.replace("\n ", " ")
+    val text1 = text.replace("\n", " ")
     val parts = text1.split(" ")
     val set = mutableSetOf<String>()
     val list = mutableListOf<Int>()
