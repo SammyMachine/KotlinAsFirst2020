@@ -135,30 +135,4 @@ fun numberRevert(number: Int): Int =
     number % 10 * 100 + number / 10 % 10 * 10 + number / 100 % 10
 
 
-fun spammer(text: String): Set<String> {
-    val map = mutableMapOf<String, List<Int>>()
-    val text1 = text.replace("\n", " ")
-    val parts = text1.split(" ")
-    val set = mutableSetOf<String>()
-    val list = mutableListOf<Int>()
-    for (i in parts.indices) {
-        if (parts[i].matches(Regex("""\d\d:\d\d"""))) {
-            val k = parts[i].split(":")
-            list.add((k[0].toInt() * 60 + k[1].toInt()) * 60)
-        }
-    }
-    for (i in parts.indices.step(2))
-        if (i % 2 == 0)
-            if (map[parts[i]] == null) map[parts[i]] = listOf(list[i / 2])
-            else map[parts[i]] = map[parts[i]]!! + list[i / 2]
-    for ((key, value) in map) {
-        if (value.size > 1)
-            for (i in 0 until value.size - 1)
-                for (j in 1 until value.size)
-                    if (abs(value[i] - value[j]) < 120) set.add(key)
-    }
-    return set
-}
-
-
 
