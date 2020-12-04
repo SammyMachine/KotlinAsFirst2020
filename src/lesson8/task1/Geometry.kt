@@ -195,7 +195,8 @@ fun lineByPoints(a: Point, b: Point): Line = Line(b, (atan2(b.y - a.y, b.x - a.x
  *
  * Построить серединный перпендикуляр по отрезку или по двум точкам
  */
-fun bisectorByPoints(a: Point, b: Point): Line = TODO()
+fun bisectorByPoints(a: Point, b: Point): Line =
+    Line(Point((a.x + b.x) / 2, (a.y + b.y) / 2), ((lineByPoints(a, b).angle) + PI / 2) % PI)
 
 /**
  * Средняя (3 балла)
