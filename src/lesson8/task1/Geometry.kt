@@ -210,7 +210,22 @@ fun bisectorByPoints(a: Point, b: Point): Line =
  *
  * Если в списке менее двух окружностей, бросить IllegalArgumentException
  */
-fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> = TODO()
+fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
+    if (circles.size < 2) throw IllegalArgumentException()
+    var circle1 = circles[0]
+    var circle2 = circles[1]
+    var distance1 = circle1.distance(circle2)
+    for (i in 0..circles.lastIndex)
+        for (j in i + 1..circles.lastIndex) {
+            val distance2 = circles[i].distance(circles[j])
+            if (distance1 > distance2) {
+                circle1 = circles[i]
+                circle2 = circles[j]
+                distance1 = distance2
+            }
+        }
+    return Pair(circle1, circle2)
+}
 
 /**
  * Сложная (5 баллов)
@@ -221,7 +236,13 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> = TODO()
  * (построить окружность по трём точкам, или
  * построить окружность, описанную вокруг треугольника - эквивалентная задача).
  */
-fun circleByThreePoints(a: Point, b: Point, c: Point): Circle = TODO()
+fun circleByThreePoints(a: Point, b: Point, c: Point): Circle {
+    val perpendicular1 = bisectorByPoints(a, b)
+    val perpendicular2 = bisectorByPoints(b, c)
+    val center = perpendicular1.crossPoint(perpendicular2)
+    val radius = center.distance(b)
+    return Circle(center, radius)
+}
 
 /**
  * Очень сложная (10 баллов)
@@ -234,5 +255,26 @@ fun circleByThreePoints(a: Point, b: Point, c: Point): Circle = TODO()
  * три точки данного множества, либо иметь своим диаметром отрезок,
  * соединяющий две самые удалённые точки в данном множестве.
  */
-fun minContainingCircle(vararg points: Point): Circle = TODO()
+fun minContainingCircle(vararg points: Point): Circle {
+    var counter = 0
+    if (points.isEmpty()) throw IllegalArgumentException()
+    if (points.size == 1) return Circle(points[0], 0.0)
+    if (points.size == 2) return circleByDiameter(Segment(points[0], points[1]))
+    val circleFirst = circleByDiameter(diameter(*points))
+    for (point in points)
+        if (circleFirst.contains(point)) counter++
+    if (counter == points.size) return circleFirst
+    var minCircle = Circle(points[0], Double.POSITIVE_INFINITY)
+    for (i in points.indices)
+        for (j in i + 1..points.lastIndex)
+            for (k in j + 1..points.lastIndex) {
+                counter = 0
+                val circleSecond = circleByThreePoints(points[i], points[j], points[k])
+                for (point in points)
+                    if (circleSecond.contains(point)) counter++
+                if (counter != points.size) continue
+                if (circleSecond.radius < minCircle.radius) minCircle = circleSecond
+            }
+    return minCircle
+}
 
