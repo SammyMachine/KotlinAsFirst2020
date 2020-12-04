@@ -264,7 +264,7 @@ fun minContainingCircle(vararg points: Point): Circle {
     for (point in points)
         if (circleFirst.contains(point)) counter++
     if (counter == points.size) return circleFirst
-    var minCircle = Circle(points[0], Double.POSITIVE_INFINITY)
+    var minCircle = Circle(points[0], Double.MAX_VALUE)
     for (i in points.indices)
         for (j in i + 1..points.lastIndex)
             for (k in j + 1..points.lastIndex) {
