@@ -267,7 +267,32 @@ fun pathBetweenHexes(from: HexPoint, to: HexPoint): List<HexPoint> {
  *
  * Если все три точки совпадают, вернуть шестиугольник нулевого радиуса с центром в данной точке.
  */
-fun hexagonByThreePoints(a: HexPoint, b: HexPoint, c: HexPoint): Hexagon? = TODO()
+fun hexagonByThreePoints(a: HexPoint, b: HexPoint, c: HexPoint): Hexagon? {
+    val hexPoints = listOf(a, b, c)
+    val maxDistance = maxOf(a.distance(b), a.distance(c), b.distance(c))
+    var minDistance = maxDistance
+    val directionUpLeft = a.x - maxDistance to a.y + maxDistance // эта и следующая строка показались мне наиболее выгодными
+    val directionDownRight = a.x + maxDistance to a.y - maxDistance // вариантами как с изменением 'x', так и с 'y', двигаться будем по косой диагонали и проверять гекс на наличие возможного центра шестиугольника
+    val hexPointDownRight = HexPoint(directionDownRight.first, directionDownRight.second)
+    var center = hexPointDownRight
+    loop@ for (y in directionDownRight.second..directionUpLeft.second) {
+        var x = directionDownRight.first
+        while (x != directionUpLeft.first) {
+            x--
+            val currentHexPoint = HexPoint(x, y)
+            val currentDistance = a.distance(currentHexPoint)
+            if (currentDistance <= minDistance &&
+                hexPoints[1].distance(currentHexPoint) == currentDistance &&
+                hexPoints[2].distance(currentHexPoint) == currentDistance
+            ) {
+                center = currentHexPoint
+                minDistance = currentDistance
+                break@loop
+            }
+        }
+    }
+    return if (center == hexPointDownRight) null else Hexagon(center, minDistance)
+}
 
 /**
  * Очень сложная (20 баллов)
