@@ -239,15 +239,15 @@ fun pathBetweenHexes(from: HexPoint, to: HexPoint): List<HexPoint> {
     var currentHex = hex1
     var currentX = currentHex.x
     var currentY = currentHex.y
-    while (true) {
+    while (!(currentX == hex2.x && currentY == hex2.y)) {
         path.add(currentHex)
-        if (currentX == hex2.x && currentY == hex2.y) break
         currentX += if (currentX > hex2.x) -1
         else if (currentX < hex2.x && currentY == hex2.y) +1
         else 0
         if (currentY != hex2.y) currentY++
         currentHex = HexPoint(currentX, currentY)
     }
+    path.add(currentHex)
     if (flag) path.reverse()
     return path
 }
