@@ -47,23 +47,6 @@ data class HexPoint(val x: Int, val y: Int) {
         else abs(y - other.y)
 
     override fun toString(): String = "$y.$x"
-
-    private fun possibleHexNeighbors() =
-        listOf(
-            HexPoint(x - 1, y),
-            HexPoint(x + 1, y),
-            HexPoint(x, y - 1),
-            HexPoint(x, y + 1),
-            HexPoint(x - 1, y + 1),
-            HexPoint(x + 1, y - 1)
-        )
-
-    fun closestHex(other: HexPoint): HexPoint {
-        val distance = distance(other)
-        for (hex in possibleHexNeighbors())
-            if (hex.distance(other) < distance) return hex
-        return other
-    }
 }
 
 /**
@@ -245,14 +228,27 @@ fun HexPoint.move(direction: Direction, distance: Int): HexPoint {
  *     )
  */
 fun pathBetweenHexes(from: HexPoint, to: HexPoint): List<HexPoint> {
-    val path = mutableListOf(from)
-    var distance = from.distance(to)
-    var hexAtThisTime = from
-    while (distance > 0) {
-        hexAtThisTime = hexAtThisTime.closestHex(to)
-        path.add(hexAtThisTime)
-        distance = hexAtThisTime.distance(to)
+    val path = mutableListOf<HexPoint>()
+    var hex1 = from
+    var hex2 = to
+    val flag = from.y > to.y
+    if (flag) {
+        hex1 = to
+        hex2 = from
     }
+    var currentHex = hex1
+    var currentX = currentHex.x
+    var currentY = currentHex.y
+    while (true) {
+        path.add(currentHex)
+        if (currentX == hex2.x && currentY == hex2.y) break
+        currentX += if (currentX > hex2.x) -1
+        else if (currentX < hex2.x && currentY == hex2.y) +1
+        else 0
+        if (currentY != hex2.y) currentY++
+        currentHex = HexPoint(currentX, currentY)
+    }
+    if (flag) path.reverse()
     return path
 }
 
