@@ -275,7 +275,7 @@ fun hexagonByThreePoints(a: HexPoint, b: HexPoint, c: HexPoint): Hexagon? {
     val directionDownRight = a.x + maxDistance to a.y - maxDistance // вариантами как с изменением 'x', так и с 'y', двигаться будем по косой диагонали и проверять гекс на наличие возможного центра шестиугольника
     val hexPointDownRight = HexPoint(directionDownRight.first, directionDownRight.second)
     var center = hexPointDownRight
-    loop@ for (y in directionDownRight.second..directionUpLeft.second) {
+    for (y in directionDownRight.second..directionUpLeft.second) {
         var x = directionDownRight.first
         while (x != directionUpLeft.first) {
             x--
@@ -287,7 +287,6 @@ fun hexagonByThreePoints(a: HexPoint, b: HexPoint, c: HexPoint): Hexagon? {
             ) {
                 center = currentHexPoint
                 minDistance = currentDistance
-                break@loop
             }
         }
     }
