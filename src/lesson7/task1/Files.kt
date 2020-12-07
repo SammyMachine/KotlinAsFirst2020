@@ -194,11 +194,13 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     var mainLine = ""
     val correctLines = mutableListOf<String>()
     for (index in lines) {
-        var correctLine = index.trim()
-        while (correctLine.matches(Regex("""  """)))
-            correctLine = correctLine.replace("  ", " ")
-        correctLines.add(correctLine)
-        if (correctLine.length > mainLine.length) mainLine = correctLine
+        val correctLineFirst = index.trim().split(Regex("\\s+"))
+        var correctLineSecond = ""
+        for (i in correctLineFirst.indices)
+            correctLineSecond += if (i != correctLineFirst.size - 1) correctLineFirst[i] + " "
+            else correctLineFirst[i]
+        if (correctLineSecond.length > mainLine.length) mainLine = correctLineSecond
+        correctLines.add(correctLineSecond)
     }
     for (line in correctLines) {
         var k = line.length
