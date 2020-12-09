@@ -151,20 +151,4 @@ class Tests {
         assertThrows(IllegalArgumentException::class.java) { computeDeviceCells(10, "+>+>[+>", 3) }
         assertThrows(IllegalStateException::class.java) { computeDeviceCells(20, ">>>>>>>>>>>>>", 12) }
     }
-
-
-    @Test
-    fun trains() {
-        assertEquals(
-            setOf("000", "25", "42"),
-            listOf(
-                "000; 00:30; Москва",
-                "258; 23:59; Москва",
-                "978; 19:20; Новгород",
-                "332; 06:52; Тверь",
-                "42; 14:02; Москва",
-                "25; 07:00; Москва"
-            )
-        )
-    }
 }
