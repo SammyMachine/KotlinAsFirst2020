@@ -298,3 +298,18 @@ fun fromRoman(roman: String): Int = TODO()
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+
+fun trains(schedule: List<String>, destination: String, deadline: String): Set<String> {
+    val deadlineSplit = deadline.split(":")
+    val numberOfTrains = mutableSetOf<String>()
+    for (line in schedule) {
+        if (line.matches(Regex("""(\d+; \d{2}:\d{2}; [А-я]*)"""))) {
+            val newLine = line.split("; ")
+            val numberOfTrain = newLine[0]
+            val timeSplit = newLine[1].split(":")
+            if (timeSplit[0].toInt() < deadlineSplit[0].toInt() && timeSplit[1].toInt() < deadlineSplit[1].toInt() && newLine[2] == destination)
+                numberOfTrains.add(numberOfTrain)
+        } else throw IllegalArgumentException()
+    }
+    return numberOfTrains
+}

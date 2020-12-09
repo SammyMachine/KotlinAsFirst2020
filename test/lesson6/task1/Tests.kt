@@ -71,6 +71,7 @@ class Tests {
     @Test
     @Tag("5")
     fun bestLongJump() {
+        assertEquals(-1, bestLongJump("+ 1 34 63"))
         assertEquals(717, bestLongJump("706 % - 717 - 703"))
         assertEquals(-1, bestLongJump("% - - % -"))
         assertEquals(754, bestLongJump("700 717 707 % 754"))
@@ -90,7 +91,7 @@ class Tests {
     @Tag("6")
     fun plusMinus() {
         assertEquals(0, plusMinus("0"))
-        assertEquals(4, plusMinus("2 + 2"))
+        assertEquals(8, plusMinus("2 + 2 + 4"))
         assertEquals(6, plusMinus("2 + 31 - 40 + 13"))
         assertEquals(-1, plusMinus("0 - 1"))
         assertThrows(IllegalArgumentException::class.java) { plusMinus("+2") }
@@ -149,5 +150,21 @@ class Tests {
         assertThrows(IllegalArgumentException::class.java) { computeDeviceCells(10, "===", 3) }
         assertThrows(IllegalArgumentException::class.java) { computeDeviceCells(10, "+>+>[+>", 3) }
         assertThrows(IllegalStateException::class.java) { computeDeviceCells(20, ">>>>>>>>>>>>>", 12) }
+    }
+
+
+    @Test
+    fun trains() {
+        assertEquals(
+            setOf("000", "25", "42"),
+            listOf(
+                "000; 00:30; Москва",
+                "258; 23:59; Москва",
+                "978; 19:20; Новгород",
+                "332; 06:52; Тверь",
+                "42; 14:02; Москва",
+                "25; 07:00; Москва"
+            )
+        )
     }
 }
