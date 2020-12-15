@@ -154,12 +154,12 @@ fun centerFile(inputName: String, outputName: String) {
         if (index.trim().length > mainLine.length) mainLine = index.trim()
     for (index in lines) {
         val correctLine = StringBuilder(index.trim())
-        repeat((mainLine.length - correctLine.length) / 2) { correctLine.insert(0, " ") }
         file.write(correctLine.toString())
         file.newLine()
     }
     file.close()
 }
+// file.write(" ".repeat((mainLine.length - correctLine.length) / 2) + correctLine)
 
 /**
  * Сложная (20 баллов)
