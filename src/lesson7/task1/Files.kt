@@ -148,18 +148,15 @@ fun sibilants(inputName: String, outputName: String) {
  */
 fun centerFile(inputName: String, outputName: String) {
     val file = File(outputName).bufferedWriter()
-    var mainLine = ""
-    val lines = File(inputName).readLines()
-    for (index in lines)
-        if (index.trim().length > mainLine.length) mainLine = index.trim()
-    for (index in lines) {
-        val correctLine = StringBuilder(index.trim())
-        file.write(correctLine.toString())
+    var lines = File(inputName).readLines()
+    lines = lines.map { it.trim() }
+    val mainLine = lines.maxByOrNull { it.length }!!
+    for (line in lines) {
+        file.write(" ".repeat((mainLine.length - line.length) / 2) + line)
         file.newLine()
     }
     file.close()
 }
-// file.write(" ".repeat((mainLine.length - correctLine.length) / 2) + correctLine)
 
 /**
  * Сложная (20 баллов)
@@ -240,7 +237,19 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val lines = File(inputName).readLines()
+    val result = mutableMapOf<String, Int>()
+    for (line in lines) {
+        val words = line.toLowerCase().split(Regex("""[^A-zА-яa-zа-яЁё]+"""))
+        for (word in words)
+            if (word != "") result[word] = result.getOrDefault(word, 0) + 1
+    }
+    return if (result.size >= 20) {
+        val list = result.toList().sortedByDescending { it.second }
+        list.take(20).toMap() + result.filter { it.value == list[19].second }
+    } else result
+}
 
 /**
  * Средняя (14 баллов)
