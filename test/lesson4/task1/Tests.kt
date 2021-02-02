@@ -218,6 +218,7 @@ class Tests {
         assertEquals(Int.MAX_VALUE, decimalFromString("a02220281", 11))
     }
 
+
     @Test
     @Tag("5")
     fun roman() {
@@ -231,6 +232,7 @@ class Tests {
     @Test
     @Tag("7")
     fun russian() {
+        assertEquals("девяносто семь тысяч двадцать один", russian(97021))
         assertEquals("триста семьдесят пять", russian(375))
         assertEquals("двадцать две тысячи девятьсот шестьдесят четыре", russian(22964))
         assertEquals("сто девятнадцать тысяч пятьсот восемь", russian(119508))
@@ -239,4 +241,5 @@ class Tests {
         assertEquals("девятьсот тысяч", russian(900000))
         assertEquals("двенадцать", russian(12))
     }
+
 }

@@ -194,12 +194,42 @@ class Tests {
     @Tag("4")
     fun averageStockPrice() {
         assertEquals(
-            mapOf<String, Double>(),
-            averageStockPrice(listOf())
+            mapOf(
+                "" to 0.047619047619047616
+            ),
+            averageStockPrice(
+                listOf(
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 0.0,
+                    "" to 1.0,
+                )
+            )
         )
         assertEquals(
             mapOf("MSFT" to 100.0, "NFLX" to 40.0),
             averageStockPrice(listOf("MSFT" to 100.0, "NFLX" to 40.0))
+        )
+        assertEquals(
+            mapOf<String, Double>(),
+            averageStockPrice(listOf())
         )
         assertEquals(
             mapOf("MSFT" to 150.0, "NFLX" to 40.0),
@@ -257,6 +287,8 @@ class Tests {
     @Test
     @Tag("3")
     fun hasAnagrams() {
+        assertFalse(hasAnagrams(listOf("aaabb", "aabbb")))
+        assertFalse(hasAnagrams(listOf("aabb", "ab")))
         assertFalse(hasAnagrams(emptyList()))
         assertTrue(hasAnagrams(listOf("рот", "свет", "тор")))
         assertFalse(hasAnagrams(listOf("рот", "свет", "код", "дверь")))
@@ -305,6 +337,26 @@ class Tests {
     @Tag("6")
     fun findSumOfTwo() {
         assertEquals(
+            Pair(0, 2),
+            findSumOfTwo(listOf(2, 2, 3, 3), 5)
+        )
+        assertEquals(
+            Pair(0, 2),
+            findSumOfTwo(listOf(0, 0, 1, 0, 0, 0, 0, 0, 0, 1), 1)
+        )
+        assertEquals(
+            Pair(-1, -1),
+            findSumOfTwo(listOf(0), 0)
+        )
+        assertEquals(
+            Pair(-1, -1),
+            findSumOfTwo(listOf(1), 5)
+        )
+        assertEquals(
+            Pair(1, 2),
+            findSumOfTwo(listOf(1, 0, 0, 2), 0)
+        )
+        assertEquals(
             Pair(-1, -1),
             findSumOfTwo(emptyList(), 1)
         )
@@ -315,6 +367,10 @@ class Tests {
         assertEquals(
             Pair(-1, -1),
             findSumOfTwo(listOf(1, 2, 3), 6)
+        )
+        assertEquals(
+            Pair(0, 3),
+            findSumOfTwo(listOf(1, 2, 10, 4), 5)
         )
     }
 

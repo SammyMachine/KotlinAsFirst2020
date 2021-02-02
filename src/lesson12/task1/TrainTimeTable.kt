@@ -2,6 +2,7 @@
 
 package lesson12.task1
 
+
 /**
  * Класс "расписание поездов".
  *
@@ -26,7 +27,16 @@ class TrainTimeTable(val baseStationName: String) {
      * @param destination конечная станция
      * @return true, если поезд успешно добавлен, false, если такой поезд уже есть
      */
-    fun addTrain(train: String, depart: Time, destination: Stop): Boolean = TODO()
+    private val array = mutableListOf<Triple<String, Time, Stop>>()
+    fun addTrain(train: String, depart: Time, destination: Stop): Boolean {
+        val check = array.find { it.first == train }
+        return if (check == null) {
+            array.add(Triple(train, depart, destination))
+            true
+        } else
+            false
+
+    }
 
     /**
      * Удалить существующий поезд.
@@ -36,7 +46,14 @@ class TrainTimeTable(val baseStationName: String) {
      * @param train название поезда
      * @return true, если поезд успешно удалён, false, если такой поезд не существует
      */
-    fun removeTrain(train: String): Boolean = TODO()
+    fun removeTrain(train: String): Boolean {
+        val check = array.find { it.first == train }
+        return if (check == null) false
+        else {
+            array.remove(check)
+            true
+        }
+    }
 
     /**
      * Добавить/изменить начальную, промежуточную или конечную остановку поезду.
@@ -97,7 +114,7 @@ data class Time(val hour: Int, val minute: Int) : Comparable<Time> {
     /**
      * Сравнение времён на больше/меньше (согласно контракту compareTo)
      */
-    override fun compareTo(other: Time): Int = TODO()
+    override fun compareTo(other: Time): Int = other.compareTo(this)
 }
 
 /**
