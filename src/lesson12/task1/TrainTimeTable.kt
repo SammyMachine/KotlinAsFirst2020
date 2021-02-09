@@ -87,7 +87,6 @@ class TrainTimeTable(private val baseStationName: String) {
         var result = false
         for (i in array.indices) {
             if (train == array[i].name) {
-                val destination = array[i].stops[array[i].stops.size - 1]
                 if (baseStationName == stop.name) {
                     for (a in 1 until array[i].stops.size - 1)
                         if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(stop.time) == -1) throw IllegalArgumentException()
@@ -105,8 +104,7 @@ class TrainTimeTable(private val baseStationName: String) {
                 } else {
 
                     for (a in array[i].stops.indices) {
-                        if (array[i].stops[a].time == stop.time || array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[a].time.compareTo(stop.time) == -1)
-                            throw IllegalArgumentException()
+                        if (array[i].stops[a].time == stop.time || array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[array[i].stops.size - 1].time.compareTo(stop.time) == -1) throw IllegalArgumentException()
                         if (array[i].stops[a].name.contains(stop.name)) {
                             array[i].stops[a].time = stop.time
                             result = false
@@ -187,14 +185,6 @@ data class Stop(val name: String, var time: Time)
 data class Train(val name: String, val stops: List<Stop>) {
     constructor(name: String, vararg stops: Stop) : this(name, stops.asList())
 
-    fun removing(train: Train, stop: Stop): Train {
-        val destination = train.stops.last()
-        val list = train.stops as MutableList<Stop>
-        train.stops.removeAt(stops.size - 1)
-        train.stops.add(stop)
-        train.stops.add(destination)
-        return train
-    }
 }
 
 
