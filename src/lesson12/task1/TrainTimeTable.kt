@@ -2,6 +2,9 @@
 
 package lesson12.task1
 
+import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
+import java.lang.IllegalArgumentException
+
 
 /**
  * Класс "расписание поездов".
@@ -16,7 +19,12 @@ package lesson12.task1
  *
  * В конструктор передаётся название станции отправления для данного расписания.
  */
-class TrainTimeTable(val baseStationName: String) {
+class TrainTimeTable(private val baseStationName: String) {
+
+    data class Route(val train: String, var depart: Time, val destination: Stop)
+
+    private var array = arrayListOf<Train>()
+
     /**
      * Добавить новый поезд.
      *
@@ -27,15 +35,16 @@ class TrainTimeTable(val baseStationName: String) {
      * @param destination конечная станция
      * @return true, если поезд успешно добавлен, false, если такой поезд уже есть
      */
-    private val array = mutableListOf<Triple<String, Time, Stop>>()
-    fun addTrain(train: String, depart: Time, destination: Stop): Boolean {
-        val check = array.find { it.first == train }
-        return if (check == null) {
-            array.add(Triple(train, depart, destination))
-            true
-        } else
-            false
+    private fun stopDepart(depart: Time): Stop = Stop(baseStationName, depart)
 
+    fun addTrain(train: String, depart: Time, destination: Stop): Boolean {
+        val check = array.find { it.name == train }
+        return if (check != null) {
+            false
+        } else {
+            array.add(Train(train, stopDepart(depart), destination))
+            true
+        }
     }
 
     /**
@@ -47,8 +56,9 @@ class TrainTimeTable(val baseStationName: String) {
      * @return true, если поезд успешно удалён, false, если такой поезд не существует
      */
     fun removeTrain(train: String): Boolean {
-        val check = array.find { it.first == train }
-        return if (check == null) false
+        val check = array.find { it.name == train }
+        return if (check == null)
+            false
         else {
             array.remove(check)
             true
@@ -73,7 +83,46 @@ class TrainTimeTable(val baseStationName: String) {
      * @param stop начальная, промежуточная или конечная станция
      * @return true, если поезду была добавлена новая остановка, false, если было изменено время остановки на старой
      */
-    fun addStop(train: String, stop: Stop): Boolean = TODO()
+    fun addStop(train: String, stop: Stop): Boolean {
+        var result = false
+        for (i in array.indices) {
+            if (train == array[i].name) {
+                val destination = array[i].stops[array[i].stops.size - 1]
+                if (baseStationName == stop.name) {
+                    for (a in 1 until array[i].stops.size - 1)
+                        if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(stop.time) == -1) throw IllegalArgumentException()
+                        else {
+                            array[i].stops[0].time = stop.time
+                            result = false
+                        }
+                } else if (array[i].stops[array[i].stops.size - 1].name == stop.name) {
+                    for (a in 0 until array[i].stops.size - 2)
+                        if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(stop.time) == 1) throw IllegalArgumentException()
+                        else {
+                            array[i].stops[array[i].stops.size - 1].time = stop.time
+                            result = false
+                        }
+                } else {
+
+                    for (a in array[i].stops.indices) {
+                        if (array[i].stops[a].time == stop.time || array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[a].time.compareTo(stop.time) == -1)
+                            throw IllegalArgumentException()
+                        if (array[i].stops[a].name.contains(stop.name)) {
+                            array[i].stops[a].time = stop.time
+                            result = false
+                            break
+
+                        } else {
+                            array[i].stops.
+                            result = true
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        return result
+    }
 
     /**
      * Удалить одну из промежуточных остановок.
@@ -104,7 +153,10 @@ class TrainTimeTable(val baseStationName: String) {
      * Расписания считаются одинаковыми, если содержат одинаковый набор поездов,
      * и поезда с тем же именем останавливаются на одинаковых станциях в одинаковое время.
      */
-    override fun equals(other: Any?): Boolean = TODO()
+    override fun equals(other: Any?): Boolean =
+        other is TrainTimeTable && (array == other.array)
+
+
 }
 
 /**
@@ -114,13 +166,19 @@ data class Time(val hour: Int, val minute: Int) : Comparable<Time> {
     /**
      * Сравнение времён на больше/меньше (согласно контракту compareTo)
      */
-    override fun compareTo(other: Time): Int = other.compareTo(this)
+    override fun compareTo(other: Time): Int {
+        return when {
+            this.hour < other.hour || (this.hour == other.hour && this.minute < other.minute) -> -1
+            this.hour > other.hour || (this.hour == other.hour && this.minute > other.minute) -> 1
+            else -> 0
+        }
+    }
 }
 
 /**
  * Остановка (название, время прибытия)
  */
-data class Stop(val name: String, val time: Time)
+data class Stop(val name: String, var time: Time)
 
 /**
  * Поезд (имя, список остановок, упорядоченный по времени).
@@ -128,4 +186,16 @@ data class Stop(val name: String, val time: Time)
  */
 data class Train(val name: String, val stops: List<Stop>) {
     constructor(name: String, vararg stops: Stop) : this(name, stops.asList())
+
+    fun removing(train: Train, stop: Stop): Train {
+        val destination = train.stops.last()
+        val list = train.stops as MutableList<Stop>
+        train.stops.removeAt(stops.size - 1)
+        train.stops.add(stop)
+        train.stops.add(destination)
+        return train
+    }
 }
+
+
+
