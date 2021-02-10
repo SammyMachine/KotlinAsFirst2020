@@ -23,7 +23,7 @@ class TrainTimeTable(private val baseStationName: String) {
 
     data class Route(val train: String, var depart: Time, val destination: Stop)
 
-    private var array = arrayListOf<Train>()
+    private var array = mutableListOf<Train>()
 
     /**
      * Добавить новый поезд.
@@ -88,12 +88,16 @@ class TrainTimeTable(private val baseStationName: String) {
         for (i in array.indices) {
             if (train == array[i].name) {
                 if (baseStationName == stop.name) {
-                    for (a in 1 until array[i].stops.size - 1)
-                        if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(stop.time) == -1) throw IllegalArgumentException()
-                        else {
+                    for (a in array[i].stops.indices) {
+                        if (array[i].stops[a].name != stop.name) {
+                            if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(
+                                    stop.time
+                                ) == -1
+                            ) throw IllegalArgumentException()
                             array[i].stops[0].time = stop.time
                             result = false
                         }
+                    }
                 } else if (array[i].stops[array[i].stops.size - 1].name == stop.name) {
                     for (a in 0 until array[i].stops.size - 2)
                         if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(stop.time) == 1) throw IllegalArgumentException()
@@ -104,20 +108,24 @@ class TrainTimeTable(private val baseStationName: String) {
                 } else {
 
                     for (a in array[i].stops.indices) {
-                        if (array[i].stops[a].time == stop.time || array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[array[i].stops.size - 1].time.compareTo(stop.time) == -1) throw IllegalArgumentException()
+                        if (array[i].stops[a].time == stop.time || array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[array[i].stops.size - 1].time.compareTo(
+                                stop.time
+                            ) == -1
+                        ) throw IllegalArgumentException()
                         if (array[i].stops[a].name.contains(stop.name)) {
                             array[i].stops[a].time = stop.time
                             result = false
                             break
 
                         } else {
-                            array[i].stops.
+                            array[i].replace(array[i], stop)
                             result = true
                             break
                         }
                     }
                 }
             }
+            break
         }
         return result
     }
@@ -184,6 +192,18 @@ data class Stop(val name: String, var time: Time)
  */
 data class Train(val name: String, val stops: List<Stop>) {
     constructor(name: String, vararg stops: Stop) : this(name, stops.asList())
+
+    fun replace(train: Train, stop: Stop) {
+        if (stops.size == 2)
+            train.stops.toMutableList().add(1, stop)
+        else
+            for (i in 1 until train.stops.size - 2) {
+                if (train.stops[i].time.compareTo(stop.time) == 1)
+                    train.stops.toMutableList().add(i, stop)
+                break
+            }
+    }
+
 
 }
 
