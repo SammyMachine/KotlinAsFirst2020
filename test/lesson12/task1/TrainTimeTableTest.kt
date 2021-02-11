@@ -39,8 +39,11 @@ class TrainTimeTableTest {
         val ttt = TrainTimeTable("СПб")
         assertTrue(ttt.addTrain("N1", Time(6, 35), Stop("Пушкин", Time(7, 4))))
         assertTrue(ttt.addTrain("N2", Time(6, 18), Stop("Пушкин", Time(6, 45))))
+        assertTrue(ttt.addStop("N2", Stop("Шушары", Time(6, 37))))
+        assertTrue(ttt.addStop("N2", Stop("xd", Time(6, 35))))
         assertFalse(ttt.addStop("N1", Stop("СПб", Time(6, 31))))
         assertTrue(ttt.addStop("N1", Stop("Купчино", Time(6, 46))))
+        assertTrue(ttt.addStop("N1", Stop("xd", Time(6, 41))))
         assertThrows(IllegalArgumentException::class.java) {
             ttt.addStop("N1", Stop("Неверная", Time(7, 11)))
         }

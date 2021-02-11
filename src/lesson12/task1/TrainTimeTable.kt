@@ -2,9 +2,7 @@
 
 package lesson12.task1
 
-import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
 import java.lang.IllegalArgumentException
-import java.util.*
 
 
 /**
@@ -114,16 +112,29 @@ class TrainTimeTable(private val baseStationName: String) {
                     if (array[i].stops.size == 2) {
                         array[i] = array[i].addIntermediateStation(array[i], stop)
                         result = true
+                    } else if (array[i].stops.size == 3) {
+                        if (array[i].stops[1].name.contains(stop.name)) {
+                            array[i].stops[1].time = stop.time
+                            result = false
+                            break
+                        } else {
+                            array[i] = array[i].addIntermediateStation(array[i], stop)
+                            result = true
+                            break
+                        }
+
                     } else {
-                        for (a in 1 until array[i].stops.size - 2)
+                        for (a in 1 until array[i].stops.size - 1)
                             if (array[i].stops[a].name.contains(stop.name)) {
                                 array[i].stops[a].time = stop.time
                                 result = false
                                 break
                             } else {
-                                array[i] = array[i].addIntermediateStation(array[i], stop)
-                                result = true
-                                break
+                                if (array[i].stops[a].name == stop.name) {
+                                    array[i] = array[i].addIntermediateStation(array[i], stop)
+                                    result = true
+                                    break
+                                }
                             }
                     }
                 }
@@ -243,13 +254,15 @@ class TrainTimeTable(private val baseStationName: String) {
         val list5 = mutableListOf<String>()
         val list6 = mutableListOf<String>()
         if (other is TrainTimeTable) {
-            for (i in this.array.indices) {
-                list1.add(this.array[i].name)
+            for (i in array.indices) {
+                list1.add(array[i].name)
                 list2.add(other.array[i].name)
                 for (a in array[i].stops.indices) {
-                    list3.add(this.array[i].stops[a].time)
+                    list3.add(array[i].stops[a].time)
+                    list5.add(array[i].stops[a].name)
+                }
+                for (a in other.array[i].stops.indices) {
                     list4.add(other.array[i].stops[a].time)
-                    list5.add(this.array[i].stops[a].name)
                     list6.add(other.array[i].stops[a].name)
                 }
             }
@@ -258,6 +271,13 @@ class TrainTimeTable(private val baseStationName: String) {
         }
         return result
     }
+
+    override fun hashCode(): Int {
+        var result = baseStationName.hashCode()
+        result = 31 * result + array.hashCode()
+        return result
+    }
+
 }
 
 /**
@@ -292,7 +312,11 @@ data class Train(val name: String, val stops: List<Stop>) {
         val list: MutableList<Stop> = train.stops.toMutableList()
         if (train.stops.size == 2)
             list.add(1, stop)
-        else {
+        else if (train.stops.size == 3) {
+            if ((train.stops[1].time.compareTo(stop.time) == -1))
+                list.add(2, stop)
+            else list.add(1, stop)
+        } else {
             for (i in 1 until train.stops.size - 2)
                 if (train.stops[i].time.compareTo(stop.time) == -1) {
                     if (train.stops[i] != train.stops[train.stops.size - 1]) {
@@ -302,7 +326,6 @@ data class Train(val name: String, val stops: List<Stop>) {
                         }
                     } else list.add(i + 1, stop)
                 } else list.add(i, stop)
-
         }
         return Train(train.name, list)
     }
