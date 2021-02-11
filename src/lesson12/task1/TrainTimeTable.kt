@@ -111,7 +111,7 @@ class TrainTimeTable(private val baseStationName: String) {
                         ) == -1
                     ) throw IllegalArgumentException()
                     if (array[i].stops.size == 2) {
-                        array[i] = array[i].replace(array[i], stop)
+                        array[i] = array[i].addIntermediateStation(array[i], stop)
                         result = true
                     } else {
                         for (a in 1 until array[i].stops.size - 2)
@@ -120,14 +120,13 @@ class TrainTimeTable(private val baseStationName: String) {
                                 result = false
                                 break
                             } else {
-                                array[i] = array[i].replace(array[i], stop)
+                                array[i] = array[i].addIntermediateStation(array[i], stop)
                                 result = true
                                 break
                             }
                     }
                 }
             }
-            break
         }
         return result
     }
@@ -142,29 +141,102 @@ class TrainTimeTable(private val baseStationName: String) {
      * @param stopName название промежуточной остановки
      * @return true, если удаление успешно
      */
-    fun removeStop(train: String, stopName: String): Boolean = TODO()
+    fun removeStop(train: String, stopName: String): Boolean {
+        var result = false
+        for (i in array.indices) {
+            if (train == array[i].name) {
+                if (stopName == baseStationName || stopName == array[i].stops[array[i].stops.size - 1].name) {
+                    result = false
+                    break
+                } else {
+                    for (a in array[i].stops.indices)
+                        if (array[i].stops[a].name == stopName) {
+                            array[i] = array[i].removeIntermediateStation(array[i], stopName)
+                            result = true
+                            break
+                        }
+                }
+            }
+        }
+        return result
+    }
 
     /**
      * Вернуть список всех поездов, упорядоченный по времени отправления с baseStationName
      */
-    fun trains(): List<Train> = TODO()
+    fun trains(): List<Train> {
+        val listOfTrains = mutableListOf<Train>()
+        for (i in array.indices) {
+            if (listOfTrains.isEmpty() && array[i].stops[0].name == baseStationName)
+                listOfTrains.add(array[i])
+            else if (listOfTrains.size == 1) {
+                if (listOfTrains[0].stops[0].time.compareTo(array[i].stops[0].time) == -1)
+                    listOfTrains.add(1, array[i])
+                else
+                    listOfTrains.add(0, array[i])
+            } else {
+                for (a in listOfTrains.indices) {
+                    if (listOfTrains[a].stops[0].time.compareTo(array[i].stops[0].time) == -1) {
+                        if (listOfTrains[a] != listOfTrains[listOfTrains.size - 1]) {
+                            if (listOfTrains[a + 1].stops[0].time.compareTo(array[i].stops[0].time) == -1)
+                                listOfTrains.add(a + 1, array[i])
+                        } else listOfTrains.add(a + 1, array[i])
+                    } else listOfTrains.add(a, array[i])
+                }
+            }
+        }
+        return listOfTrains
+    }
 
     /**
      * Вернуть список всех поездов, отправляющихся не ранее currentTime
      * и имеющих остановку (начальную, промежуточную или конечную) на станции destinationName.
      * Список должен быть упорядочен по времени прибытия на станцию destinationName
      */
-    fun trains(currentTime: Time, destinationName: String): List<Train> = TODO()
+    fun trains(currentTime: Time, destinationName: String): List<Train> {
+        val listOfTrains = mutableListOf<Train>()
+        val listOfTrainsDestinationIndices = mutableListOf<Pair<String, Int>>()
+        for (i in array.indices) {
+            for (a in array[i].stops.indices) {
+                if (array[i].stops[0].time.compareTo(currentTime) == 1 && array[i].stops[a].name == destinationName)
+                    if (listOfTrains.isEmpty()) {
+                        listOfTrains.add(array[i])
+                        listOfTrainsDestinationIndices.add(Pair(array[i].name, a))
+                    } else if (listOfTrains.size == 1) {
+                        if (listOfTrains[0].stops[listOfTrainsDestinationIndices[0].second].time.compareTo(array[i].stops[a].time) == -1) {
+                            listOfTrains.add(1, array[i])
+                            listOfTrainsDestinationIndices.add(Pair(array[i].name, a))
+                        } else {
+                            listOfTrains.add(0, array[i])
+                            listOfTrainsDestinationIndices.add(Pair(array[i].name, a))
+                        }
+                    } else {
+                        for (n in listOfTrains.indices) {
+                            if (listOfTrains[n].stops[listOfTrainsDestinationIndices[a].second].time.compareTo(array[i].stops[a].time) == -1) {
+                                if (listOfTrains[n] != listOfTrains[listOfTrains.size - 1]) {
+                                    if (listOfTrains[n + 1].stops[listOfTrainsDestinationIndices[a + 1].second].time.compareTo(
+                                            array[i].stops[a].time
+                                        ) == -1
+                                    )
+                                        listOfTrains.add(n + 1, array[i])
+                                } else listOfTrains.add(n + 1, array[i])
+                            } else listOfTrains.add(n, array[i])
+                        }
+                    }
+            }
+        }
+        return listOfTrains
+    }
 
     /**
      * Сравнение на равенство.
      * Расписания считаются одинаковыми, если содержат одинаковый набор поездов,
      * и поезда с тем же именем останавливаются на одинаковых станциях в одинаковое время.
      */
-    override fun equals(other: Any?): Boolean =
-        other is TrainTimeTable && (array == other.array)
-
-
+    override fun equals(other: Any?): Boolean {
+        other is TrainTimeTable
+        return array == other
+    }
 }
 
 /**
@@ -195,25 +267,31 @@ data class Stop(val name: String, var time: Time)
 data class Train(val name: String, val stops: List<Stop>) {
     constructor(name: String, vararg stops: Stop) : this(name, stops.asList())
 
-    fun replace(train: Train, stop: Stop): Train {
+    fun addIntermediateStation(train: Train, stop: Stop): Train {
         val list: MutableList<Stop> = train.stops.toMutableList()
         if (train.stops.size == 2)
             list.add(1, stop)
-        else if (train.stops.size == 3) {
-            if (train.stops[1].time.compareTo(stop.time) == -1)
-                list.add(2, stop)
-            else {
-                if (train.stops[1].time.compareTo(stop.time) == 1)
-                    list.add(1, stop)
-            }
-        } else {
+        else {
             for (i in 1 until train.stops.size - 2)
                 if (train.stops[i].time.compareTo(stop.time) == -1) {
-                    if (train.stops[i].time.compareTo(stop.time) == 1) {
-                        list.add(i + 1, stop)
-                        break
-                    }
-                }
+                    if (train.stops[i] != train.stops[train.stops.size - 1]) {
+                        if (train.stops[i + 1].time.compareTo(stop.time) == 1) {
+                            list.add(i + 1, stop)
+                            break
+                        }
+                    } else list.add(i + 1, stop)
+                } else list.add(i, stop)
+
+        }
+        return Train(train.name, list)
+    }
+
+    fun removeIntermediateStation(train: Train, stopName: String): Train {
+        val list: MutableList<Stop> = train.stops.toMutableList()
+        for (i in 1 until train.stops.size - 2) {
+            if (train.stops[i].name == stopName)
+                list.removeAt(i)
+            break
         }
         return Train(train.name, list)
     }
