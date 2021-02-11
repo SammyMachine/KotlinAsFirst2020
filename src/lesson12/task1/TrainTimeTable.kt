@@ -4,6 +4,7 @@ package lesson12.task1
 
 import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
 import java.lang.IllegalArgumentException
+import java.util.*
 
 
 /**
@@ -234,8 +235,28 @@ class TrainTimeTable(private val baseStationName: String) {
      * и поезда с тем же именем останавливаются на одинаковых станциях в одинаковое время.
      */
     override fun equals(other: Any?): Boolean {
-        other is TrainTimeTable
-        return array == other
+        var result = false
+        val list1 = mutableListOf<String>()
+        val list2 = mutableListOf<String>()
+        val list3 = mutableListOf<Time>()
+        val list4 = mutableListOf<Time>()
+        val list5 = mutableListOf<String>()
+        val list6 = mutableListOf<String>()
+        if (other is TrainTimeTable) {
+            for (i in this.array.indices) {
+                list1.add(this.array[i].name)
+                list2.add(other.array[i].name)
+                for (a in array[i].stops.indices) {
+                    list3.add(this.array[i].stops[a].time)
+                    list4.add(other.array[i].stops[a].time)
+                    list5.add(this.array[i].stops[a].name)
+                    list6.add(other.array[i].stops[a].name)
+                }
+            }
+            if (list1.all { it in list2 } && list3.all { it in list4 } && list5.all { it in list6 } && list1.size == list2.size && list3.size == list4.size && list5.size == list6.size) result =
+                true
+        }
+        return result
     }
 }
 
