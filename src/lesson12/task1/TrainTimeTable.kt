@@ -21,8 +21,6 @@ import java.lang.IllegalArgumentException
  */
 class TrainTimeTable(private val baseStationName: String) {
 
-    data class Route(val train: String, var depart: Time, val destination: Stop)
-
     private var array = mutableListOf<Train>()
 
     /**
@@ -87,41 +85,45 @@ class TrainTimeTable(private val baseStationName: String) {
         var result = false
         for (i in array.indices) {
             if (train == array[i].name) {
+                // Случай, когда baseStationName == stop.name
                 if (baseStationName == stop.name) {
                     for (a in array[i].stops.indices) {
                         if (array[i].stops[a].name != stop.name) {
-                            if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(
-                                    stop.time
-                                ) == -1
-                            ) throw IllegalArgumentException()
+                            if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(stop.time) == -1) throw IllegalArgumentException()
                             array[i].stops[0].time = stop.time
                             result = false
                         }
                     }
+                    // Случай, когда destinationStationName == stop.name
                 } else if (array[i].stops[array[i].stops.size - 1].name == stop.name) {
-                    for (a in 0 until array[i].stops.size - 2)
-                        if (array[i].stops[a].time == stop.time || array[i].stops[a].time.compareTo(stop.time) == 1) throw IllegalArgumentException()
-                        else {
-                            array[i].stops[array[i].stops.size - 1].time = stop.time
-                            result = false
-                        }
-                } else {
-
-                    for (a in 1 until array[i].stops.size - 2) {
-                        if (array[i].stops[a].time == stop.time || array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[array[i].stops.size - 1].time.compareTo(
+                    for (a in 0 until array[i].stops.size - 2) {
+                        if (array[i].stops[a].time == stop.time || array[i].stops[array[i].stops.size - 2].time.compareTo(
                                 stop.time
-                            ) == -1
+                            ) == 1
                         ) throw IllegalArgumentException()
-                        if (array[i].stops[a].name.contains(stop.name)) {
-                            array[i].stops[a].time = stop.time
-                            result = false
-                            break
-
-                        } else {
-                            array[i] = array[i].replaceMore(array[i], stop)
-                            result = true
-                            break
-                        }
+                        array[i].stops[array[i].stops.size - 1].time = stop.time
+                        result = false
+                    }
+                    // Случай, когда stop.name - промежуточная станция
+                } else {
+                    if (array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[array[i].stops.size - 1].time.compareTo(
+                            stop.time
+                        ) == -1
+                    ) throw IllegalArgumentException()
+                    if (array[i].stops.size == 2) {
+                        array[i] = array[i].replace(array[i], stop)
+                        result = true
+                    } else {
+                        for (a in 1 until array[i].stops.size - 2)
+                            if (array[i].stops[a].name.contains(stop.name)) {
+                                array[i].stops[a].time = stop.time
+                                result = false
+                                break
+                            } else {
+                                array[i] = array[i].replace(array[i], stop)
+                                result = true
+                                break
+                            }
                     }
                 }
             }
@@ -193,10 +195,26 @@ data class Stop(val name: String, var time: Time)
 data class Train(val name: String, val stops: List<Stop>) {
     constructor(name: String, vararg stops: Stop) : this(name, stops.asList())
 
-    fun replaceMore(train: Train, stop: Stop): Train {
+    fun replace(train: Train, stop: Stop): Train {
         val list: MutableList<Stop> = train.stops.toMutableList()
         if (train.stops.size == 2)
             list.add(1, stop)
+        else if (train.stops.size == 3) {
+            if (train.stops[1].time.compareTo(stop.time) == -1)
+                list.add(2, stop)
+            else {
+                if (train.stops[1].time.compareTo(stop.time) == 1)
+                    list.add(1, stop)
+            }
+        } else {
+            for (i in 1 until train.stops.size - 2)
+                if (train.stops[i].time.compareTo(stop.time) == -1) {
+                    if (train.stops[i].time.compareTo(stop.time) == 1) {
+                        list.add(i + 1, stop)
+                        break
+                    }
+                }
+        }
         return Train(train.name, list)
     }
 
