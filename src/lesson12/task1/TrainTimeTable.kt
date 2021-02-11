@@ -107,7 +107,7 @@ class TrainTimeTable(private val baseStationName: String) {
                         }
                 } else {
 
-                    for (a in array[i].stops.indices) {
+                    for (a in 1 until array[i].stops.size - 2) {
                         if (array[i].stops[a].time == stop.time || array[i].stops[0].time.compareTo(stop.time) == 1 || array[i].stops[array[i].stops.size - 1].time.compareTo(
                                 stop.time
                             ) == -1
@@ -118,7 +118,7 @@ class TrainTimeTable(private val baseStationName: String) {
                             break
 
                         } else {
-                            array[i].replace(array[i], stop)
+                            array[i] = array[i].replaceMore(array[i], stop)
                             result = true
                             break
                         }
@@ -193,19 +193,13 @@ data class Stop(val name: String, var time: Time)
 data class Train(val name: String, val stops: List<Stop>) {
     constructor(name: String, vararg stops: Stop) : this(name, stops.asList())
 
-    fun replace(train: Train, stop: Stop) {
-        if (stops.size == 2)
-            train.stops.toMutableList().add(1, stop)
-        else
-            for (i in 1 until train.stops.size - 2) {
-                if (train.stops[i].time.compareTo(stop.time) == 1)
-                    train.stops.toMutableList().add(i, stop)
-                break
-            }
+    fun replaceMore(train: Train, stop: Stop): Train {
+        val list: MutableList<Stop> = train.stops.toMutableList()
+        if (train.stops.size == 2)
+            list.add(1, stop)
+        return Train(train.name, list)
     }
 
-
 }
-
 
 
