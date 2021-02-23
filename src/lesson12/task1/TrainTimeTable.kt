@@ -166,8 +166,8 @@ class TrainTimeTable(private val baseStationName: String) {
                 val check = array.find { it == element }
                 if (check != null) {
                     list1.add(check.name)
+                    list2.add(element.name)
                 }
-                list2.add(element.name)
                 for (a in element.stops.indices) {
                     list3.add(element.stops[a].time)
                     list5.add(element.stops[a].name)
@@ -264,15 +264,20 @@ data class Train(val name: String, val stops: List<Stop>) {
         if (train.stops.size == 2)
             list.add(1, stop)
         else {
-            for (i in train.stops.indices)
-                if (train.stops[i].time < stop.time) {
+            if (train.departStation.time < stop.time) {
+                for (i in 1 until train.stops.size - 1) {
                     if (train.stops[i + 1].name != train.destinationStation.name) {
                         if (train.stops[i + 1].time > stop.time) {
                             list.add(i + 1, stop)
                             break
                         }
-                    } else list.add(i + 1, stop); break
-                } else list.add(i, stop)
+                    } else {
+                        list.add(i + 1, stop)
+                        break
+                    }
+                    list.add(i + 1, stop)
+                }
+            }
         }
         return Train(train.name, list)
     }
