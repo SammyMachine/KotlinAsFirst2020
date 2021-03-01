@@ -86,20 +86,16 @@ class TrainTimeTable(private val baseStationName: String) {
      */
     fun addStop(train: String, stop: Stop): Boolean {
         var result = false
-        for (name in array) {
-            if (array.containsKey(train)) {
-                val ourTrain = Train(train, array[train]!!)
-                if (ourTrain.stationAvailability(ourTrain.stops, stop.name)) {
-                    ourTrain.checkForTimeIfAvailable(ourTrain, stop)
-                    ourTrain.timeStationChange(ourTrain, stop)
-                    result = false
-                    break
-                } else {
-                    ourTrain.checkForTimeIfNotAvailable(ourTrain, stop)
-                    array[train] = ourTrain.addIntermediateStation(ourTrain, stop).stops
-                    result = true
-                    break
-                }
+        if (array.containsKey(train)) {
+            val ourTrain = Train(train, array[train]!!)
+            if (ourTrain.stationAvailability(ourTrain.stops, stop.name)) {
+                ourTrain.checkForTimeIfAvailable(ourTrain, stop)
+                ourTrain.timeStationChange(ourTrain, stop)
+                result = false
+            } else {
+                ourTrain.checkForTimeIfNotAvailable(ourTrain, stop)
+                array[train] = ourTrain.addIntermediateStation(ourTrain, stop).stops
+                result = true
             }
         }
         return result
@@ -118,20 +114,17 @@ class TrainTimeTable(private val baseStationName: String) {
      */
     fun removeStop(train: String, stopName: String): Boolean {
         var result = false
-        for ((name, stops) in array) {
-            if (array.containsKey(train)) {
-                val ourTrain = Train(train, array[train]!!)
-                if (stopName == ourTrain.departStation.name || stopName == ourTrain.destinationStation.name) {
-                    result = false
-                    break
-                } else {
-                    for (a in ourTrain.stops.indices)
-                        if (ourTrain.stops[a].name == stopName) {
-                            array[name] = (ourTrain.removeIntermediateStation(ourTrain, ourTrain.stops[a]).stops)
-                            result = true
-                            break
-                        }
-                }
+        if (array.containsKey(train)) {
+            val ourTrain = Train(train, array[train]!!)
+            if (stopName == ourTrain.departStation.name || stopName == ourTrain.destinationStation.name) {
+                result = false
+            } else {
+                for (a in ourTrain.stops.indices)
+                    if (ourTrain.stops[a].name == stopName) {
+                        array[train] = (ourTrain.removeIntermediateStation(ourTrain, ourTrain.stops[a]).stops)
+                        result = true
+                        break
+                    }
             }
         }
         return result
