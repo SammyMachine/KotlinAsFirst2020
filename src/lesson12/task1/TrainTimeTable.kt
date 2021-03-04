@@ -153,8 +153,8 @@ class TrainTimeTable(private val baseStationName: String) {
         var result = false
         if (other is TrainTimeTable)
             if (other.table.keys == this.table.keys)
-                for ((_, value) in this.table) {
-                    if (other.table.containsValue(value))
+                for ((key, value) in this.table) {
+                    if (other.table[key]!! == value)
                         result = true
                     else
                         break
