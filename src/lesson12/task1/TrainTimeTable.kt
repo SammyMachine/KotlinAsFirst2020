@@ -20,7 +20,7 @@ import java.lang.IllegalArgumentException
  */
 class TrainTimeTable(private val baseStationName: String) {
 
-    private var array = mutableMapOf<String, List<Stop>>()
+    private var array = mutableMapOf<String, Train>()
 
     /**
      * Добавить новый поезд.
@@ -38,7 +38,7 @@ class TrainTimeTable(private val baseStationName: String) {
         if (array.containsKey(train))
             false
         else {
-            array[train] = listOf(stopDepart(depart), destination)
+            array[train] = Train(train, stopDepart(depart), destination)
             true
         }
 
@@ -79,7 +79,7 @@ class TrainTimeTable(private val baseStationName: String) {
     fun addStop(train: String, stop: Stop): Boolean {
         var result = false
         if (array.containsKey(train)) {
-            val ourTrain = Train(train, array[train]!!)
+            val ourTrain = array[train]!!
             if (ourTrain.stationAvailability(ourTrain.stops, stop.name)) {
                 ourTrain.checkForTimeIfAvailable(ourTrain.stops, stop)
                 ourTrain.timeStationChange(ourTrain.stops, stop)
@@ -107,7 +107,7 @@ class TrainTimeTable(private val baseStationName: String) {
     fun removeStop(train: String, stopName: String): Boolean {
         var result = false
         if (array.containsKey(train)) {
-            val ourTrain = Train(train, array[train]!!)
+            val ourTrain = array[train]!!
             if (stopName == ourTrain.departStation.name || stopName == ourTrain.destinationStation.name) {
                 result = false
             } else {
@@ -126,7 +126,7 @@ class TrainTimeTable(private val baseStationName: String) {
      * Вернуть список всех поездов, упорядоченный по времени отправления с baseStationName
      */
     fun trains(): List<Train> {
-        val list: MutableList<Train> = array.map { Train(it.key, it.value) }.toList() as MutableList<Train>
+        val list = array.map { it.value }.toMutableList()
         return list.sortedBy { it.destinationStation.time }
     }
 
@@ -136,9 +136,9 @@ class TrainTimeTable(private val baseStationName: String) {
      * Список должен быть упорядочен по времени прибытия на станцию destinationName
      */
     fun trains(currentTime: Time, destinationName: String): List<Train> {
-        val list: MutableList<Train> = array.filter { Train(it.key, it.value).departStation.time >= currentTime }
-            .filter { Train(it.key, it.value).stationAvailability(it.value, destinationName) }
-            .map { Train(it.key, it.value) }.toList() as MutableList<Train>
+        val list = array.filter { it.value.departStation.time >= currentTime }
+            .filter { it.value.stationAvailability(it.value.stops, destinationName) }
+            .map { it.value }.toMutableList()
         return list.sortedBy { it.needStation(it.stops, destinationName).time }
     }
 
@@ -151,35 +151,14 @@ class TrainTimeTable(private val baseStationName: String) {
 
     fun equals(other: Any?): Boolean {
         var result = false
-        val list1 = mutableListOf<String>()
-        val list2 = mutableListOf<String>()
-        val list3 = mutableListOf<Time>()
-        val list4 = mutableListOf<Time>()
-        val list5 = mutableListOf<String>()
-        val list6 = mutableListOf<String>()
-        if (other is TrainTimeTable) {
-            for ((name, stops) in other.array) {
-                if (other.array.containsKey(name)) {
-                    list1.add(name)
-                    list2.add(name)
+        if (other is TrainTimeTable)
+            if (other.array.keys == this.array.keys)
+                for ((_, value) in this.array) {
+                    if (other.array.containsValue(value))
+                        result = true
+                    else
+                        break
                 }
-                for (a in stops.indices) {
-                    list3.add(stops[a].time)
-                    list5.add(stops[a].name)
-                }
-                for (a in stops.indices) {
-                    list4.add(stops[a].time)
-                    list6.add(stops[a].name)
-                }
-            }
-            if (list1.all { it in list2 } &&
-                list3.all { it in list4 } &&
-                list5.all { it in list6 } &&
-                list1.size == list2.size &&
-                list3.size == list4.size &&
-                list5.size == list6.size)
-                result = true
-        }
         return result
     }
 
@@ -254,7 +233,7 @@ data class Train(val name: String, val stops: List<Stop>) {
         if (stop.time <= stops[0].time || stop.time >= stops.last().time) throw IllegalArgumentException()
     }
 
-    fun addIntermediateStation(stops: List<Stop>, stop: Stop): List<Stop> {
+    fun addIntermediateStation(stops: List<Stop>, stop: Stop): Train {
         val list = stops.toMutableList()
         if (stops.size == 2)
             list.add(1, stop)
@@ -277,13 +256,13 @@ data class Train(val name: String, val stops: List<Stop>) {
             }
 
         }
-        return list
+        return Train(this.name, list)
     }
 
-    fun removeIntermediateStation(stops: List<Stop>, stop: Stop): List<Stop> {
+    fun removeIntermediateStation(stops: List<Stop>, stop: Stop): Train {
         val list = stops.toMutableList()
         list.remove(stop)
-        return list
+        return Train(this.name, list)
     }
 
     fun stationAvailability(stops: List<Stop>, checkStationName: String): Boolean =
