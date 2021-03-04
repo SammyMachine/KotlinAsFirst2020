@@ -20,7 +20,7 @@ import java.lang.IllegalArgumentException
  */
 class TrainTimeTable(private val baseStationName: String) {
 
-    private var array = mutableMapOf<String, Train>()
+    private var table = mutableMapOf<String, Train>()
 
     /**
      * Добавить новый поезд.
@@ -35,10 +35,10 @@ class TrainTimeTable(private val baseStationName: String) {
     private fun stopDepart(depart: Time): Stop = Stop(baseStationName, depart)
 
     fun addTrain(train: String, depart: Time, destination: Stop): Boolean =
-        if (array.containsKey(train))
+        if (table.containsKey(train))
             false
         else {
-            array[train] = Train(train, stopDepart(depart), destination)
+            table[train] = Train(train, stopDepart(depart), destination)
             true
         }
 
@@ -51,10 +51,10 @@ class TrainTimeTable(private val baseStationName: String) {
      * @return true, если поезд успешно удалён, false, если такой поезд не существует
      */
     fun removeTrain(train: String): Boolean =
-        if (!array.containsKey(train))
+        if (!table.containsKey(train))
             false
         else {
-            array.remove(train)
+            table.remove(train)
             true
         }
 
@@ -78,15 +78,15 @@ class TrainTimeTable(private val baseStationName: String) {
      */
     fun addStop(train: String, stop: Stop): Boolean {
         var result = false
-        if (array.containsKey(train)) {
-            val ourTrain = array[train]!!
+        if (table.containsKey(train)) {
+            val ourTrain = table[train]!!
             if (ourTrain.stationAvailability(ourTrain.stops, stop.name)) {
                 ourTrain.checkForTimeIfAvailable(ourTrain.stops, stop)
                 ourTrain.timeStationChange(ourTrain.stops, stop)
                 result = false
             } else {
                 ourTrain.checkForTimeIfNotAvailable(ourTrain.stops, stop)
-                array[train] = ourTrain.addIntermediateStation(ourTrain.stops, stop)
+                table[train] = ourTrain.addIntermediateStation(ourTrain.stops, stop)
                 result = true
             }
         }
@@ -106,14 +106,14 @@ class TrainTimeTable(private val baseStationName: String) {
      */
     fun removeStop(train: String, stopName: String): Boolean {
         var result = false
-        if (array.containsKey(train)) {
-            val ourTrain = array[train]!!
+        if (table.containsKey(train)) {
+            val ourTrain = table[train]!!
             if (stopName == ourTrain.departStation.name || stopName == ourTrain.destinationStation.name) {
                 result = false
             } else {
                 for (a in ourTrain.stops.indices)
                     if (ourTrain.stops[a].name == stopName) {
-                        array[train] = ourTrain.removeIntermediateStation(ourTrain.stops, ourTrain.stops[a])
+                        table[train] = ourTrain.removeIntermediateStation(ourTrain.stops, ourTrain.stops[a])
                         result = true
                         break
                     }
@@ -126,7 +126,7 @@ class TrainTimeTable(private val baseStationName: String) {
      * Вернуть список всех поездов, упорядоченный по времени отправления с baseStationName
      */
     fun trains(): List<Train> {
-        val list = array.map { it.value }.toMutableList()
+        val list = table.map { it.value }.toMutableList()
         return list.sortedBy { it.destinationStation.time }
     }
 
@@ -136,7 +136,7 @@ class TrainTimeTable(private val baseStationName: String) {
      * Список должен быть упорядочен по времени прибытия на станцию destinationName
      */
     fun trains(currentTime: Time, destinationName: String): List<Train> {
-        val list = array.filter { it.value.departStation.time >= currentTime }
+        val list = table.filter { it.value.departStation.time >= currentTime }
             .filter { it.value.stationAvailability(it.value.stops, destinationName) }
             .map { it.value }.toMutableList()
         return list.sortedBy { it.needStation(it.stops, destinationName).time }
@@ -152,9 +152,9 @@ class TrainTimeTable(private val baseStationName: String) {
     fun equals(other: Any?): Boolean {
         var result = false
         if (other is TrainTimeTable)
-            if (other.array.keys == this.array.keys)
-                for ((_, value) in this.array) {
-                    if (other.array.containsValue(value))
+            if (other.table.keys == this.table.keys)
+                for ((_, value) in this.table) {
+                    if (other.table.containsValue(value))
                         result = true
                     else
                         break
@@ -164,7 +164,7 @@ class TrainTimeTable(private val baseStationName: String) {
 
     override fun hashCode(): Int {
         var result = baseStationName.hashCode()
-        result = 31 * result + array.hashCode()
+        result = 31 * result + table.hashCode()
         return result
     }
 
